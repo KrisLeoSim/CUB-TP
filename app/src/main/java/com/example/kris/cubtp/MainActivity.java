@@ -14,7 +14,15 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class MainActivity extends AppCompatActivity {
+
+    Calendar calendar;
+    SimpleDateFormat simpledateformat;
+    String sDate;
+    TextView textinstante;
 
     Button btnstart;
     Button btnend;
@@ -29,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // --- INSTANTE (Tempo)
+        textinstante = (TextView) findViewById(R.id.textinstante);
 
 
         // --- ACELEROMETRO
@@ -45,8 +56,14 @@ public class MainActivity extends AppCompatActivity {
                 float x = sensorEvent.values[0];
                 float y = sensorEvent.values[1];
                 float z = sensorEvent.values[2];
-                textacelerometro.setText("X: "+x+"\nY: "+y+"\nZ: "+z,TextView.BufferType.NORMAL);
-                //Toast.makeText(getApplicationContext(),"X: "+x+"\nY: "+y+"\nZ: "+z,Toast.LENGTH_LONG).show();
+                int acc = sensorEvent.accuracy;
+                textacelerometro.setText("X: "+x+"\nY: "+y+"\nZ: "+z+"\nacc: "+acc,TextView.BufferType.NORMAL);
+
+                // METER ISTO NUMA CLASS ? OU FUNCAO
+                calendar = Calendar.getInstance();
+                simpledateformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                sDate = simpledateformat.format(calendar.getTime());
+                textinstante.setText("TEMPO: "+sDate,TextView.BufferType.NORMAL);
             }
 
             @Override
