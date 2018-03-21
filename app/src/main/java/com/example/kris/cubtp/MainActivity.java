@@ -53,10 +53,26 @@ public class MainActivity extends AppCompatActivity {
         sensoreventlistener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
-                float x = sensorEvent.values[0];
-                float y = sensorEvent.values[1];
-                float z = sensorEvent.values[2];
-                int acc = sensorEvent.accuracy;
+                // alpha is calculated as t / (t + dT)
+                // with t, the low-pass filter's time-constant
+                // and dT, the event delivery rate
+
+                final float alpha = (float) 0.8;
+                float gravity[] = new float[3];
+                float x;
+                float y;
+                float z;
+                int acc = sensorEvent.accuracy; //isto tera utilidade?
+
+                gravity[0] = alpha * gravity[0] + (1 - alpha) * sensorEvent.values[0];
+                gravity[1] = alpha * gravity[1] + (1 - alpha) * sensorEvent.values[1];
+                gravity[2] = alpha * gravity[2] + (1 - alpha) * sensorEvent.values[2];
+
+                x = sensorEvent.values[0] - gravity[0];
+                y = sensorEvent.values[1] - gravity[1];
+                z = sensorEvent.values[2] - gravity[2];
+
+
                 textacelerometro.setText("X: "+x+"\nY: "+y+"\nZ: "+z+"\nacc: "+acc,TextView.BufferType.NORMAL);
 
                 // METER ISTO NUMA CLASS ? OU FUNCAO
