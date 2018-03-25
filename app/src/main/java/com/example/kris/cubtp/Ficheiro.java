@@ -18,7 +18,7 @@ public class Ficheiro {
 
     public void saveFile(String text){
         try {
-            FileOutputStream fos = context.openFileOutput(FileName,Context.MODE_PRIVATE);
+            FileOutputStream fos = context.openFileOutput(FileName,Context.MODE_APPEND);
             fos.write(text.getBytes());
             fos.close();
             Toast.makeText(context,"Saved!",Toast.LENGTH_LONG).show();

@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.kris.cubtp">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.SET_DEBUG_APP"></uses-permission> <!-- Tentativa de resolver o waiting for debugger NAO DEU! -->
     <!--<user-feature android:name="android.hardware.sensor.accelerometer" android:required = "true"/>-->
     <application
         android:allowBackup="true"
