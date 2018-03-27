@@ -24,77 +24,75 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    Calendar calendar;
-    SimpleDateFormat simpledateformat;
-    TextView textinstante;
-    Button btnstart;
-    Button btnend;
-    Button btntranf;
-    TextView textgps;
-    TextView textacelerometro;
-    SensorManager sensormanager;
-    Sensor sensor;
-    SensorEventListener sensoreventlistener;
+    private Calendar calendar;
+    private SimpleDateFormat simpledateformat;
+    private TextView textinstante;
+    private Button btnstart;
+    private Button btnend;
+    private Button btntranf;
+    private TextView textgps;
+    private TextView textacelerometro;
+    private SensorManager sensormanager;
+    private Sensor sensor;
+    private SensorEventListener sensoreventlistener;
+    private Ficheiro file;
+    private TextView textgiroscopio;
+    private TextView titulogiroscopio;
+    private TextView titulogps;
+    private TextView tituloacelerometro;
+    private TextView tituloinstante;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        final Ficheiro file = new Ficheiro(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        file = new Ficheiro(getApplicationContext());
+
         // --- FINDVIEWBYID
-        final TextView titulogps = (TextView) findViewById(R.id.titulogps);
-        final TextView tituloacelerometro = (TextView) findViewById(R.id.tituloacelerometro);
-        final TextView tituloinstante = (TextView) findViewById(R.id.tituloinstante);
+        titulogps = (TextView) findViewById(R.id.titulogps);
+        tituloacelerometro = (TextView) findViewById(R.id.tituloacelerometro);
+        tituloinstante = (TextView) findViewById(R.id.tituloinstante);
         textinstante = (TextView) findViewById(R.id.textinstante);
         Spinner spinner = (Spinner) findViewById(R.id.spinneractividades);
         btnend = (Button) findViewById(R.id.btnend);
         btntranf = (Button) findViewById(R.id.btntranf);
         btnstart = (Button) findViewById(R.id.btnstart);
         textgps = (TextView) findViewById(R.id.textgps);
+        textgiroscopio = (TextView) findViewById(R.id.textgiroscopio);
+        tituloacelerometro = (TextView) findViewById(R.id.titulogiroscopio);
 
         InicializaAcelerometro();
 
-        // --- GPS --- BUTTON INICIAR ATIVIDADE
+        // --- BUTTON INICIAR ATIVIDADE
         ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},123);
         btnstart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                GPS gps = new GPS(getApplicationContext());
-                Location l = gps.getLocation();
-
-                file.saveFile("Teste a ver se guarda bem no ficheiro\n");
-
-                if (l != null){
-                    double lat = l.getLatitude();
-                    double lon = l.getLongitude();
-                    double alt = l.getAltitude();
-                    textgps.setText("LAT: "+lat+"\nLON: "+lon+"\nALT: "+alt,TextView.BufferType.NORMAL);
-                    //Toast.makeText(getApplicationContext(),"||GPS||\nLAT: "+lat+"\nLON: "+lon+"\nALT: "+alt,Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-
-        // --- ACELEROMETRO INICIAR --- BUTTON PARAR ATIVIDADE
-        btnend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // inicia a leitura do sensor
                 sensormanager.registerListener(sensoreventlistener,sensor,SensorManager.SENSOR_DELAY_NORMAL);
 
-                String testelerfich =  file.readFile();
-                Toast.makeText(getApplicationContext(),"Leu: "+testelerfich,Toast.LENGTH_LONG).show();
+                //String testelerfich =  file.readFile();
+                //Toast.makeText(getApplicationContext(),"Leu: "+testelerfich,Toast.LENGTH_LONG).show();
             }
         });
 
 
-        // --- ACELEROMETRO TERMINAR --- BUTTON TANSFERIR / LIMPAR FICHEIRO
-        btntranf.setOnClickListener(new View.OnClickListener() {
+        // --- BUTTON PARAR ATIVIDADE
+        btnend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Parar a leitura do acelerometro
                 sensormanager.unregisterListener(sensoreventlistener);
+            }
+        });
+
+
+        // --- BUTTON TANSFERIR / LIMPAR FICHEIRO
+        btntranf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 
@@ -117,6 +115,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     titulogps.setVisibility(View.VISIBLE);
                     tituloacelerometro.setVisibility(View.VISIBLE);
                     tituloinstante.setVisibility(View.VISIBLE);
+                    titulogiroscopio.setVisibility(View.VISIBLE);
+                    textgiroscopio.setVisibility(View.VISIBLE);
                 }else{
                     textacelerometro.setVisibility(View.INVISIBLE);
                     textgps.setVisibility(View.INVISIBLE);
@@ -124,6 +124,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     titulogps.setVisibility(View.INVISIBLE);
                     tituloacelerometro.setVisibility(View.INVISIBLE);
                     tituloinstante.setVisibility(View.INVISIBLE);
+                    titulogiroscopio.setVisibility(View.INVISIBLE);
+                    textgiroscopio.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -177,6 +179,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 // OBTEM TEMPO E ATUALIZA TEXTVIEW
                 String sDate = getTempo();
                 textinstante.setText("TEMPO: "+sDate,TextView.BufferType.NORMAL);
+
+                //Faz a leitura GPS a cada alteraçao do acelerometro (isto certeza que nao sera assim mas pornto por agora fica)
+                LeituraGPS();
             }
 
             @Override
@@ -184,6 +189,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             }
         };
+    }
+
+    // --- GPS
+    public void LeituraGPS(){
+        GPS gps = new GPS(getApplicationContext());
+        Location l = gps.getLocation();
+
+        //file.saveFile("Teste a ver se guarda bem no ficheiro\n");
+
+        if (l != null){
+            double lat = l.getLatitude();
+            double lon = l.getLongitude();
+            double alt = l.getAltitude();
+            textgps.setText("LAT: "+lat+"\nLON: "+lon+"\nALT: "+alt,TextView.BufferType.NORMAL);
+            //Toast.makeText(getApplicationContext(),"||GPS||\nLAT: "+lat+"\nLON: "+lon+"\nALT: "+alt,Toast.LENGTH_LONG).show();
+        }
     }
 
 }
