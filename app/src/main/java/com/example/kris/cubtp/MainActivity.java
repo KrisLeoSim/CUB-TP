@@ -22,6 +22,7 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private Calendar calendar;
@@ -32,15 +33,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Button btntranf;
     private TextView textgps;
     private TextView textacelerometro;
-    private SensorManager sensormanager;
-    private Sensor sensor;
-    private SensorEventListener sensoreventlistener;
+    private SensorManager sensormanager,sensormanager_giro;
+    private Sensor sensor, sensor_giro;
+    private SensorEventListener sensoreventlistener, sensoreventlistener1;
     private Ficheiro file;
     private TextView textgiroscopio;
     private TextView titulogiroscopio;
     private TextView titulogps;
     private TextView tituloacelerometro;
     private TextView tituloinstante;
+    private boolean tem_acelerometro = false , tem_giroscopio = false;
+    final private Giroscopio sens_giro = new Giroscopio();
+    final private Acelerometro sens_acel = new Acelerometro();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +53,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         file = new Ficheiro(getApplicationContext());
 
+
         // --- FINDVIEWBYID
         titulogps = (TextView) findViewById(R.id.titulogps);
         tituloacelerometro = (TextView) findViewById(R.id.tituloacelerometro);
+        textacelerometro = (TextView) findViewById(R.id.textacelerometro);
         tituloinstante = (TextView) findViewById(R.id.tituloinstante);
         textinstante = (TextView) findViewById(R.id.textinstante);
         Spinner spinner = (Spinner) findViewById(R.id.spinneractividades);
@@ -62,7 +68,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         textgiroscopio = (TextView) findViewById(R.id.textgiroscopio);
         tituloacelerometro = (TextView) findViewById(R.id.titulogiroscopio);
 
-        InicializaAcelerometro();
+
+        InicializaSensores();
 
         // --- BUTTON INICIAR ATIVIDADE
         ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},123);
@@ -70,7 +77,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View view) {
                 // inicia a leitura do sensor
-                sensormanager.registerListener(sensoreventlistener,sensor,SensorManager.SENSOR_DELAY_NORMAL);
+                RegistaSensores();
+
+                // OBTEM TEMPO E ATUALIZA TEXTVIEW
+                String sDate = getTempo();
+                textinstante.setText("TEMPO: "+sDate,TextView.BufferType.NORMAL);
+
+                //GPS
+                LeituraGPS();
 
                 //String testelerfich =  file.readFile();
                 //Toast.makeText(getApplicationContext(),"Leu: "+testelerfich,Toast.LENGTH_LONG).show();
@@ -78,12 +92,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
 
 
+
         // --- BUTTON PARAR ATIVIDADE
         btnend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Parar a leitura do acelerometro
-                sensormanager.unregisterListener(sensoreventlistener);
+                DesregistaSensores();
+
+                textinstante.setText("PARADO",TextView.BufferType.NORMAL);
             }
         });
 
@@ -152,45 +169,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return sDate;
     }
 
-    // --- ACELEROMETRO
-    public void InicializaAcelerometro(){
-        sensormanager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensor = sensormanager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if(sensor==null){
-            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem Acelerometro",Toast.LENGTH_LONG).show();
-        }
-        textacelerometro = (TextView) findViewById(R.id.textacelerometro);
-
-        sensoreventlistener = new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent sensorEvent) {
-
-                final float alpha = (float) 0.8;
-                float gravity[] = new float[3];
-                float x;
-                float y;
-                float z;
-                int acc = sensorEvent.accuracy; //isto tera utilidade?
-                x = sensorEvent.values[0];
-                y = sensorEvent.values[1];
-                z = sensorEvent.values[2];
-                textacelerometro.setText("X: "+x+"\nY: "+y+"\nZ: "+z+"\nacc: "+acc,TextView.BufferType.NORMAL);
-
-                // OBTEM TEMPO E ATUALIZA TEXTVIEW
-                String sDate = getTempo();
-                textinstante.setText("TEMPO: "+sDate,TextView.BufferType.NORMAL);
-
-                //Faz a leitura GPS a cada alteraçao do acelerometro (isto certeza que nao sera assim mas pornto por agora fica)
-                LeituraGPS();
-            }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int i) {
-
-            }
-        };
-    }
-
     // --- GPS
     public void LeituraGPS(){
         GPS gps = new GPS(getApplicationContext());
@@ -207,4 +185,88 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    public void InicializaSensores(){
+        sensormanager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        sensor = sensormanager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if(sensor==null){
+            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem Acelerometro",Toast.LENGTH_LONG).show();
+        }else{
+            tem_acelerometro=true;
+        }
+
+        sensor_giro = sensormanager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        if(sensor_giro==null){
+            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem Giroscopio",Toast.LENGTH_LONG).show();
+        }else{
+            tem_giroscopio=true;
+        }
+    }
+
+    public void RegistaSensores(){
+        // inicia a leitura do sensor
+        if(tem_giroscopio){
+        sensormanager.registerListener(sens_giro,sensor_giro, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
+        if(tem_acelerometro) {
+            sensormanager.registerListener(sens_acel, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    public void DesregistaSensores(){
+        // para a leitura do sensor
+        if(tem_giroscopio){
+            sensormanager.unregisterListener(sens_giro);
+        }
+
+        if(tem_acelerometro) {
+            sensormanager.unregisterListener(sens_acel);
+        }
+    }
+
+   class Giroscopio implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+
+            float x ;
+            float y ;
+            float z ;
+
+            x = sensorEvent.values[0];
+            y = sensorEvent.values[1];
+            z = sensorEvent.values[2];
+
+            int acc = sensorEvent.accuracy;
+
+            textgiroscopio.setText("X: "+(int)x+ "\nY: "+(int)y+ "\nZ: "+(int)z+"\nacc: "+acc, TextView.BufferType.NORMAL);
+
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    }
+
+    class Acelerometro implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+
+            float x= sensorEvent.values[0];
+            float y= sensorEvent.values[1];
+            float z= sensorEvent.values[2];
+
+            int acc = sensorEvent.accuracy;
+
+            textacelerometro.setText("X: "+(int)x+"\nY: "+(int)y+ "\nZ: "+(int)z+"\nacc: "+acc, TextView.BufferType.NORMAL);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    }
 }
