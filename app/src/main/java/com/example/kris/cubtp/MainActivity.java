@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnstart = (Button) findViewById(R.id.btnstart);
         textgps = (TextView) findViewById(R.id.textgps);
         textgiroscopio = (TextView) findViewById(R.id.textgiroscopio);
-        tituloacelerometro = (TextView) findViewById(R.id.titulogiroscopio);
+        titulogiroscopio = (TextView) findViewById(R.id.titulogiroscopio);
 
 
         InicializaSensores();
@@ -125,25 +125,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         escondeMostradores.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(isChecked){
+
+                if(isChecked == true) {
                     textacelerometro.setVisibility(View.VISIBLE);
                     textgps.setVisibility(View.VISIBLE);
                     textinstante.setVisibility(View.VISIBLE);
+                    textgiroscopio.setVisibility(View.VISIBLE);
                     titulogps.setVisibility(View.VISIBLE);
                     tituloacelerometro.setVisibility(View.VISIBLE);
                     tituloinstante.setVisibility(View.VISIBLE);
                     titulogiroscopio.setVisibility(View.VISIBLE);
-                    textgiroscopio.setVisibility(View.VISIBLE);
                 }else{
                     textacelerometro.setVisibility(View.INVISIBLE);
                     textgps.setVisibility(View.INVISIBLE);
                     textinstante.setVisibility(View.INVISIBLE);
+                    textgiroscopio.setVisibility(View.INVISIBLE);
                     titulogps.setVisibility(View.INVISIBLE);
                     tituloacelerometro.setVisibility(View.INVISIBLE);
                     tituloinstante.setVisibility(View.INVISIBLE);
                     titulogiroscopio.setVisibility(View.INVISIBLE);
-                    textgiroscopio.setVisibility(View.INVISIBLE);
                 }
+
             }
         });
 
@@ -240,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             int acc = sensorEvent.accuracy;
 
-            textgiroscopio.setText("X: "+(int)x+ "\nY: "+(int)y+ "\nZ: "+(int)z+"\nacc: "+acc, TextView.BufferType.NORMAL);
+            textgiroscopio.setText("X: "+(int)x+ "   Y: "+(int)y+ "   Z: "+(int)z+"\nacc: "+acc, TextView.BufferType.NORMAL);
 
         }
 
@@ -261,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             int acc = sensorEvent.accuracy;
 
-            textacelerometro.setText("X: "+(int)x+"\nY: "+(int)y+ "\nZ: "+(int)z+"\nacc: "+acc, TextView.BufferType.NORMAL);
+            textacelerometro.setText("X: "+(int)x+"   Y: "+(int)y+ "   Z: "+(int)z+"\nacc: "+acc, TextView.BufferType.NORMAL);
         }
 
         @Override
