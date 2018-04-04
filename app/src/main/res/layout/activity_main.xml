@@ -273,7 +273,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:text="falta ver os ids"
+                android:text=" "
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -285,18 +285,18 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimaryDark"
                 android:paddingLeft="4dp"
-                android:text="SENSOR"
+                android:text="ORIENTAÇÃO"
                 android:textColor="@color/colormaisclaro"
                 android:textSize="24sp" />
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/textoorientation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="4dp"
-                android:text="falta ver os ids"
+                android:text=" "
                 android:textSize="18sp" />
 
         </LinearLayout>

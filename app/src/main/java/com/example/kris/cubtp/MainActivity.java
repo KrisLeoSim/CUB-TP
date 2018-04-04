@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView textgps;
     private TextView textacelerometro;
     private SensorManager sensormanager,sensormanager_giro;
-    private Sensor sensor, sensor_giro, sensor_prox;
+    private Sensor sensor, sensor_giro, sensor_prox,sensor_orientation;
     private SensorEventListener sensoreventlistener, sensoreventlistener1;
     private Ficheiro file;
     private TextView textgiroscopio;
@@ -44,10 +44,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView tituloinstante;
     private TextView tituloproximidade;
     private TextView textproximidade;
-    private boolean tem_acelerometro = false , tem_giroscopio = false, tem_proximidade = false;
+    private TextView textorientation;
+    private boolean tem_acelerometro = false , tem_giroscopio = false, tem_proximidade = false, tem_orientation = false;
     final private Giroscopio sens_giro = new Giroscopio();
     final private Acelerometro sens_acel = new Acelerometro();
     final private Proximidade sens_prox = new Proximidade();
+    final private Orientation sens_orient = new Orientation();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         titulogiroscopio = (TextView) findViewById(R.id.titulogiroscopio);
         textproximidade = (TextView) findViewById(R.id.textproximidade);
         tituloproximidade = (TextView) findViewById(R.id.tituloproximidade);
+        textorientation = (TextView) findViewById(R.id.textoorientation);
 
 
 
@@ -173,30 +176,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-
-    public String getTempo(){
-        calendar = Calendar.getInstance();
-        simpledateformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String sDate = (String) simpledateformat.format(calendar.getTime());
-        return sDate;
-    }
-
-    // --- GPS
-    public void LeituraGPS(){
-        GPS gps = new GPS(getApplicationContext());
-        Location l = gps.getLocation();
-
-        //file.saveFile("Teste a ver se guarda bem no ficheiro\n");
-
-        if (l != null){
-            double lat = l.getLatitude();
-            double lon = l.getLongitude();
-            double alt = l.getAltitude();
-            textgps.setText("LAT: "+lat+"\nLON: "+lon+"\nALT: "+alt,TextView.BufferType.NORMAL);
-            //Toast.makeText(getApplicationContext(),"||GPS||\nLAT: "+lat+"\nLON: "+lon+"\nALT: "+alt,Toast.LENGTH_LONG).show();
-        }
-    }
-
     public void InicializaSensores(){
         sensormanager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
@@ -220,12 +199,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }else{
             tem_proximidade=true;
         }
+
+        sensor_orientation = sensormanager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        if(sensor_orientation==null){
+            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem Magnetic_Field",Toast.LENGTH_LONG).show();
+        }else{
+            tem_orientation=true;
+        }
     }
 
     public void RegistaSensores(){
         // inicia a leitura do sensor
         if(tem_giroscopio){
-        sensormanager.registerListener(sens_giro,sensor_giro, SensorManager.SENSOR_DELAY_NORMAL);
+            sensormanager.registerListener(sens_giro,sensor_giro, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
         if(tem_acelerometro) {
@@ -234,6 +220,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if(tem_proximidade) {
             sensormanager.registerListener(sens_prox, sensor_prox, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
+        if(tem_orientation) {
+            sensormanager.registerListener(sens_orient, sensor_orientation, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 
@@ -250,9 +240,34 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(tem_proximidade) {
             sensormanager.unregisterListener(sens_prox);
         }
+        if(tem_orientation){
+            sensormanager.unregisterListener(sens_orient);
+        }
     }
 
-   class Giroscopio implements SensorEventListener {
+    public String getTempo(){
+        calendar = Calendar.getInstance();
+        simpledateformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String sDate = (String) simpledateformat.format(calendar.getTime());
+        return sDate;
+    }
+
+    public void LeituraGPS(){
+        GPS gps = new GPS(getApplicationContext());
+        Location l = gps.getLocation();
+
+        //file.saveFile("Teste a ver se guarda bem no ficheiro\n");
+
+        if (l != null){
+            double lat = l.getLatitude();
+            double lon = l.getLongitude();
+            double alt = l.getAltitude();
+            textgps.setText("LAT: "+lat+"\nLON: "+lon+"\nALT: "+alt,TextView.BufferType.NORMAL);
+            //Toast.makeText(getApplicationContext(),"||GPS||\nLAT: "+lat+"\nLON: "+lon+"\nALT: "+alt,Toast.LENGTH_LONG).show();
+        }
+    }
+
+    class Giroscopio implements SensorEventListener {
 
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
@@ -316,4 +331,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }
     }
+
+    class Orientation implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+
+            float azimuth_angle = sensorEvent.values[0];
+            float pitch_angle = sensorEvent.values[1];
+            float roll_angle = sensorEvent.values[2];
+
+            textorientation.setText("Azimuth: "+azimuth_angle+"\npitch "+pitch_angle+"\nroll: "+roll_angle, TextView.BufferType.NORMAL);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    }
+
+
+
 }
