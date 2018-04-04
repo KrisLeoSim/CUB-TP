@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView textgps;
     private TextView textacelerometro;
     private SensorManager sensormanager,sensormanager_giro;
-    private Sensor sensor, sensor_giro;
+    private Sensor sensor, sensor_giro, sensor_prox;
     private SensorEventListener sensoreventlistener, sensoreventlistener1;
     private Ficheiro file;
     private TextView textgiroscopio;
@@ -42,9 +42,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView titulogps;
     private TextView tituloacelerometro;
     private TextView tituloinstante;
-    private boolean tem_acelerometro = false , tem_giroscopio = false;
+    private TextView tituloproximidade;
+    private TextView textproximidade;
+    private boolean tem_acelerometro = false , tem_giroscopio = false, tem_proximidade = false;
     final private Giroscopio sens_giro = new Giroscopio();
     final private Acelerometro sens_acel = new Acelerometro();
+    final private Proximidade sens_prox = new Proximidade();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         textgps = (TextView) findViewById(R.id.textgps);
         textgiroscopio = (TextView) findViewById(R.id.textgiroscopio);
         titulogiroscopio = (TextView) findViewById(R.id.titulogiroscopio);
+        textproximidade = (TextView) findViewById(R.id.textproximidade);
+        tituloproximidade = (TextView) findViewById(R.id.tituloproximidade);
+
 
 
         InicializaSensores();
@@ -135,6 +141,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     tituloacelerometro.setVisibility(View.VISIBLE);
                     tituloinstante.setVisibility(View.VISIBLE);
                     titulogiroscopio.setVisibility(View.VISIBLE);
+                    textproximidade.setVisibility(View.VISIBLE);
+                    tituloproximidade.setVisibility(View.VISIBLE);
                 }else{
                     textacelerometro.setVisibility(View.INVISIBLE);
                     textgps.setVisibility(View.INVISIBLE);
@@ -144,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     tituloacelerometro.setVisibility(View.INVISIBLE);
                     tituloinstante.setVisibility(View.INVISIBLE);
                     titulogiroscopio.setVisibility(View.INVISIBLE);
+                    textproximidade.setVisibility(View.INVISIBLE);
+                    tituloproximidade.setVisibility(View.INVISIBLE);
                 }
 
             }
@@ -203,6 +213,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }else{
             tem_giroscopio=true;
         }
+
+        sensor_prox = sensormanager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        if(sensor_prox==null){
+            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem Proximidade",Toast.LENGTH_LONG).show();
+        }else{
+            tem_proximidade=true;
+        }
     }
 
     public void RegistaSensores(){
@@ -214,6 +231,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(tem_acelerometro) {
             sensormanager.registerListener(sens_acel, sensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
+
+        if(tem_proximidade) {
+            sensormanager.registerListener(sens_prox, sensor_prox, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     public void DesregistaSensores(){
@@ -224,6 +245,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if(tem_acelerometro) {
             sensormanager.unregisterListener(sens_acel);
+        }
+
+        if(tem_proximidade) {
+            sensormanager.unregisterListener(sens_prox);
         }
     }
 
@@ -264,6 +289,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             int acc = sensorEvent.accuracy;
 
             textacelerometro.setText("X: "+(int)x+"   Y: "+(int)y+ "   Z: "+(int)z+"\nacc: "+acc, TextView.BufferType.NORMAL);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    }
+
+    class Proximidade implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+
+            float x= sensorEvent.values[0];
+            //float val =  sensorEvent.sensor.getMaximumRange();
+
+
+            int acc = sensorEvent.accuracy;
+
+            textproximidade.setText("X: "+(int)x+"\ncm "+"\nacc: "+acc, TextView.BufferType.NORMAL);
         }
 
         @Override

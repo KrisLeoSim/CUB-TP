@@ -253,13 +253,13 @@
                 app:layout_constraintTop_toBottomOf="@+id/titulogiroscopio" />
 
             <TextView
-                android:id="@+id/titulosensor1"
+                android:id="@+id/tituloproximidade"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@color/colorPrimaryDark"
                 android:paddingLeft="4dp"
-                android:text="SENSOR"
+                android:text="PROXIMIDADE"
                 android:textColor="@color/colormaisclaro"
                 android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -267,7 +267,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/textgiroscopio" />
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/textproximidade"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -277,7 +277,7 @@
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/titulosensor1" />
+                app:layout_constraintTop_toBottomOf="@+id/tituloproximidade" />
 
             <TextView
                 android:id="@+id/titulosensor2"
