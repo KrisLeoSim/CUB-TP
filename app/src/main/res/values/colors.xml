@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colormaisescuro">#2D3142</color>
+    <color name="colormaisescuro">#2d3142</color>
     <color name="colorPrimary">#404353</color>
     <color name="colorPrimaryDark">#4f5d75</color>
     <color name="colorAccent">#ef8354</color>

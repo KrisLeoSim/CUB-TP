@@ -11,9 +11,10 @@
     <include
         android:id="@+id/CustomToolbar"
         layout="@layout/toolbar"
+        android:layout_height="52dp"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="100dp"
-        tools:ignore="MissingConstraints" />
+        tools:layout_editor_absoluteY="4dp" />
 
 
     <TextView
@@ -39,9 +40,10 @@
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:checked="true"
-        app:layout_constraintBottom_toBottomOf="@+id/CustomToolbar"
-        app:layout_constraintEnd_toEndOf="@+id/CustomToolbar"
+        app:layout_constraintBottom_toTopOf="@+id/spinneractividades"
+        app:layout_constraintEnd_toStartOf="@+id/divider"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
         tools:checked="true" />
 
     <Spinner
@@ -127,6 +129,7 @@
 
 
     <ScrollView
+        android:id="@+id/scrollview"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
@@ -280,7 +283,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tituloproximidade" />
 
             <TextView
-                android:id="@+id/titulosensor2"
+                android:id="@+id/tituloorientacao"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimaryDark"
@@ -301,6 +304,60 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/colorAccent"
+        android:buttonTint="@color/colorAccent"
+        android:text="Auto"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/spinneractividades"
+        app:layout_constraintEnd_toStartOf="@+id/divider2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="5dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/button"
+        app:layout_constraintBottom_toTopOf="@+id/spinneractividades"
+        app:layout_constraintEnd_toEndOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="5dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/button"
+        app:layout_constraintBottom_toTopOf="@+id/spinneractividades"
+        app:layout_constraintEnd_toStartOf="@+id/checkBox"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="5dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/button"
+        app:layout_constraintBottom_toTopOf="@+id/spinneractividades"
+        app:layout_constraintEnd_toStartOf="@+id/EsconderMostradores"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>

@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView tituloproximidade;
     private TextView textproximidade;
     private TextView textorientation;
+    private TextView tituloorientacao;
+    private ScrollView scrollView;
     private boolean tem_acelerometro = false , tem_giroscopio = false, tem_proximidade = false, tem_orientation = false;
     final private Giroscopio sens_giro = new Giroscopio();
     final private Acelerometro sens_acel = new Acelerometro();
@@ -75,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         textproximidade = (TextView) findViewById(R.id.textproximidade);
         tituloproximidade = (TextView) findViewById(R.id.tituloproximidade);
         textorientation = (TextView) findViewById(R.id.textoorientation);
+        tituloorientacao = (TextView) findViewById(R.id.tituloorientacao);
+        scrollView = (ScrollView) findViewById(R.id.scrollview);
 
 
 
@@ -146,6 +151,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     titulogiroscopio.setVisibility(View.VISIBLE);
                     textproximidade.setVisibility(View.VISIBLE);
                     tituloproximidade.setVisibility(View.VISIBLE);
+                    tituloorientacao.setVisibility(View.VISIBLE);
+                    textorientation.setVisibility(View.VISIBLE);
+                    scrollView.setVisibility(View.VISIBLE);
+
                 }else{
                     textacelerometro.setVisibility(View.INVISIBLE);
                     textgps.setVisibility(View.INVISIBLE);
@@ -157,6 +166,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     titulogiroscopio.setVisibility(View.INVISIBLE);
                     textproximidade.setVisibility(View.INVISIBLE);
                     tituloproximidade.setVisibility(View.INVISIBLE);
+                    tituloorientacao.setVisibility(View.INVISIBLE);
+                    textorientation.setVisibility(View.INVISIBLE);
+                    scrollView.setVisibility(View.INVISIBLE);
                 }
 
             }
@@ -282,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             int acc = sensorEvent.accuracy;
 
-            textgiroscopio.setText("X: "+(int)x+ "   Y: "+(int)y+ "   Z: "+(int)z+"\nacc: "+acc, TextView.BufferType.NORMAL);
+            textgiroscopio.setText("X: "+(int)x+ "   Y: "+(int)y+ "   Z: "+(int)z+"    acc: "+acc, TextView.BufferType.NORMAL);
 
         }
 
@@ -303,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             int acc = sensorEvent.accuracy;
 
-            textacelerometro.setText("X: "+(int)x+"   Y: "+(int)y+ "   Z: "+(int)z+"\nacc: "+acc, TextView.BufferType.NORMAL);
+            textacelerometro.setText("X: "+(int)x+"   Y: "+(int)y+ "   Z: "+(int)z+"    acc: "+acc, TextView.BufferType.NORMAL);
         }
 
         @Override
@@ -323,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             int acc = sensorEvent.accuracy;
 
-            textproximidade.setText("X: "+(int)x+"\ncm "+"\nacc: "+acc, TextView.BufferType.NORMAL);
+            textproximidade.setText("X: "+(int)x+" cm "+"    acc: "+acc, TextView.BufferType.NORMAL);
         }
 
         @Override
@@ -341,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             float pitch_angle = sensorEvent.values[1];
             float roll_angle = sensorEvent.values[2];
 
-            textorientation.setText("Azimuth: "+azimuth_angle+"\npitch "+pitch_angle+"\nroll: "+roll_angle, TextView.BufferType.NORMAL);
+            textorientation.setText("Azimuth: "+(int)azimuth_angle+"   pitch: "+(int)pitch_angle+"   roll: "+(int)roll_angle, TextView.BufferType.NORMAL);
         }
 
         @Override
@@ -350,6 +362,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-
+    
 
 }
