@@ -392,13 +392,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_view" />
 
-    <ImageView
-        android:id="@+id/listarsensores"
+    <ImageButton
+        android:id="@+id/listarsen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
         android:tint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="@+id/CustomToolbar"
         app:layout_constraintEnd_toStartOf="@+id/divider"

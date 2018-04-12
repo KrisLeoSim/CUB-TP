@@ -2,6 +2,7 @@ package com.example.kris.cubtp;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -24,15 +25,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private Calendar calendar;
     private SimpleDateFormat simpledateformat;
-    private ImageButton verconteudoficheiro;
-    private ImageButton listasensores;
+    private ImageButton verconteudoficheiro,listarSensores;
     private TextView textinstante;
     private Button btnstart;
     private Button btnend;
@@ -94,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         tituloorientacao = (TextView) findViewById(R.id.tituloorientacao);
         scrollView = (ScrollView) findViewById(R.id.scrollview);
         verconteudoficheiro = (ImageButton)findViewById(R.id.verconteudofich);
+        listarSensores = (ImageButton) findViewById(R.id.listarsen);
+
         tituloaceleracaolinear = (TextView) findViewById(R.id.tituloaceleracaolinear);
         textoaceleracaolinear = (TextView) findViewById(R.id.textoaceleracaolinear);
 
@@ -107,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnstart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 //GPS
                 if(LeituraGPS_tracker()){
 
@@ -127,8 +130,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
                 //String testelerfich =  file.readFile();
                 //Toast.makeText(getApplicationContext(),"Leu: "+testelerfich,Toast.LENGTH_LONG).show();
-
-
             }
         });
 
@@ -157,6 +158,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+
+        // --- BUTTON TANSFERIR / LIMPAR FICHEIRO
+        btntranf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+
         //MOSTRAR O CONTEUDO DO FICHEIRO
         verconteudoficheiro.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,12 +176,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-
-        // --- BUTTON TANSFERIR / LIMPAR FICHEIRO
-        btntranf.setOnClickListener(new View.OnClickListener() {
+        // LISTAR OS SENSORES DO DISPOSITIVO
+        listarSensores.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                ListarSensores();
             }
         });
 
@@ -234,6 +244,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         alertDialog.setTitle("Ficheiro CUBTP");
         // Setting Dialog Message
         alertDialog.setMessage(file.readFile());
+
+        alertDialog.show();
+    }
+
+    public void ListarSensores(){
+        SensorManager manager = (SensorManager)this.getSystemService(Context.SENSOR_SERVICE);
+        ArrayList<String> lista = new ArrayList();
+        String sensores = "";
+
+        lista =(ArrayList) manager.getSensorList(Sensor.TYPE_ALL);
+
+        for(int i=0; i<lista.size();i++){
+            sensores = (String) sensores.toString() + lista.get(i).toString() + "\n\n";
+        }
+
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        // Setting Dialog Title
+        alertDialog.setTitle("Lista de Sensores do Dispositivo");
+        // Setting Dialog Message
+        alertDialog.setMessage(sensores);
 
         alertDialog.show();
     }
