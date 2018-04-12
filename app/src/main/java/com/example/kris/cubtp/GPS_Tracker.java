@@ -45,6 +45,9 @@ public class GPS_Tracker extends Service implements LocationListener {
         getLocation();
     }
 
+
+
+
     public Location getLocation() {
         try {
             locationManager = (LocationManager) mContext
@@ -58,9 +61,18 @@ public class GPS_Tracker extends Service implements LocationListener {
             isNetworkEnabled = locationManager
                     .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
+
+
+            Log.d("GPS Enabled", ""+GPS_Activo);
+            Log.d("GPS Enabled", ""+isNetworkEnabled);
+
             if (!GPS_Activo && !isNetworkEnabled) {
                 // no network provider is enabled
+                this.canGetLocation = false;
+                Log.d("entrei no", "nao entrou");
+
             } else {
+                Log.d("entrei no", "entrou");
                 this.canGetLocation = true;
                 // First get location from Network Provider
                 if (isNetworkEnabled) {
@@ -74,6 +86,7 @@ public class GPS_Tracker extends Service implements LocationListener {
                         if (location != null) {
                             latitude = location.getLatitude();
                             longitude = location.getLongitude();
+                            latitude = location.getAltitude();
                         }
                     }
                 }
@@ -90,9 +103,13 @@ public class GPS_Tracker extends Service implements LocationListener {
                             if (location != null) {
                                 latitude = location.getLatitude();
                                 longitude = location.getLongitude();
+                                altitude = location.getAltitude();
                             }
                         }
                     }
+                }else{
+
+                    this.canGetLocation = false;
                 }
             }
 

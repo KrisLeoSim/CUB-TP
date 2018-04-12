@@ -53,6 +53,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     final private Giroscopio sens_giro = new Giroscopio();
     final private Proximidade sens_prox = new Proximidade();
     final private GeomagnAcel sens_magnAcel = new GeomagnAcel();
+    private String tempo_inicial ="";
+    private String tempo_final ="";
+    private Thread t;
+    private GPS_Tracker gps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,18 +94,36 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnstart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // inicia a leitura do sensor
-                RegistaSensores();
 
-                // OBTEM TEMPO E ATUALIZA TEXTVIEW
-                String sDate = getTempo();
-                //textinstante.setText("TEMPO: "+sDate,TextView.BufferType.NORMAL);
+
 
                 //GPS
-                LeituraGPS();
-                LeituraGPS_tracker();
+                if(LeituraGPS_tracker()){
+
+                    // inicia a leitura do sensor
+                    RegistaSensores();
+
+                    // OBTEM TEMPO E ATUALIZA TEXTVIEW
+
+                    tempo_inicial = getTempo();
+                    //textinstante.setText("TEMPO: "+tempo_inicial,TextView.BufferType.NORMAL);
+                    IniciaContagemDe_Tempo();
+
+                    btnstart.setEnabled(false);
+                    btnstart.setBackgroundResource(R.color.colorcinza);
+                    btnend.setEnabled(true);
+                    btnend.setBackgroundResource(R.color.colorAccent);
+
+                }
                 //String testelerfich =  file.readFile();
                 //Toast.makeText(getApplicationContext(),"Leu: "+testelerfich,Toast.LENGTH_LONG).show();
+
+
+
+
+
+
+
             }
         });
 
@@ -114,7 +136,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 // Parar a leitura do acelerometro
                 DesregistaSensores();
 
-                textinstante.setText("PARADO",TextView.BufferType.NORMAL);
+               // textinstante.setText("PARADO",TextView.BufferType.NORMAL);
+
+                tempo_final = getTempo();
+                t.interrupt();
+                textinstante.setText("TEMPO: "+tempo_inicial,TextView.BufferType.NORMAL);
+
+                //para GPS
+                ParaLeitura_GPS();
+
+                btnstart.setEnabled(true);
+                btnstart.setBackgroundResource(R.color.colorAccent);
+                btnend.setEnabled(false);
+                btnend.setBackgroundResource(R.color.colorcinza);
             }
         });
 
@@ -264,35 +298,55 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return sDate;
     }
 
-    public void LeituraGPS(){
-        GPS gps = new GPS(getApplicationContext());
-        Location l = gps.getLocation();
 
-        //file.saveFile("Teste a ver se guarda bem no ficheiro\n");
+    public void IniciaContagemDe_Tempo(){
+        t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while (!isInterrupted()) {
+                        Thread.sleep(1000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //TextView tdate = (TextView) findViewById(R.id.date);
+                                // long date = System.currentTimeMillis();
+                                //SimpleDateFormat sdf = new SimpleDateFormat("MMM dd yyyy\nhh-mm-ss a");
+                                // String dateString = sdf.format(date);
+                                String dateString = getTempo();
+                                // tdate.setText(dateString);
+                                textinstante.setText("TEMPO: "+dateString,TextView.BufferType.NORMAL);
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
+                }
 
-        if (l != null){
-            double lat = l.getLatitude();
-            double lon = l.getLongitude();
-            double alt = l.getAltitude();
-            textgps.setText("LAT: "+lat+"\nLON: "+lon+"\nALT: "+alt,TextView.BufferType.NORMAL);
-            //Toast.makeText(getApplicationContext(),"||GPS||\nLAT: "+lat+"\nLON: "+lon+"\nALT: "+alt,Toast.LENGTH_LONG).show();
-        }
+            }
+
+        };
+        t.start();
     }
 
-    public void LeituraGPS_tracker(){
+    public boolean LeituraGPS_tracker(){
 
-        GPS_Tracker gps = new GPS_Tracker(this);
+        gps = new GPS_Tracker(this);
         if(gps.canGetLocation()) {
 
             double latitude = gps.getLatitude();
             double longitude = gps.getLongitude();
             double altitude = gps.getAltitude();
 
-            textinstante.setText("LAT: "+latitude+"\nLON: "+longitude+"\nALT: "+altitude,TextView.BufferType.NORMAL);
+            textgps.setText("LAT: "+latitude+"\nLON: "+longitude+"\nALT: "+altitude,TextView.BufferType.NORMAL);
+        }else{
+            gps.showSettingsAlert();
+            return false;
         }
-
+    return true;
     }
-
+public void ParaLeitura_GPS(){
+        gps.stopUsingGPS();
+}
 
     class Giroscopio implements SensorEventListener {
 
