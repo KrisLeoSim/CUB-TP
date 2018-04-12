@@ -64,6 +64,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         file = new Ficheiro(getApplicationContext());
+        file.saveFile("MAE do Grosso\n");
+        Toast.makeText(getApplicationContext(),file.readFile(),Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(),,Toast.LENGTH_LONG).show();
 
 
         // --- FINDVIEWBYID
@@ -86,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         scrollView = (ScrollView) findViewById(R.id.scrollview);
 
 
+        btnend.setBackgroundResource(R.drawable.button_desligado);
+        btnend.setEnabled(false);
 
         InicializaSensores();
 
@@ -94,7 +99,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnstart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
 
 
                 //GPS
@@ -110,9 +114,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     IniciaContagemDe_Tempo();
 
                     btnstart.setEnabled(false);
-                    //btnstart.setBackgroundResource(R.color.colorcinza);
+                    btnstart.setBackgroundResource(R.drawable.button_desligado);
                     btnend.setEnabled(true);
-                   // btnend.setBackgroundResource(R.color.colorAccent);
+                    btnend.setBackgroundResource(R.drawable.button);
+
 
                 }
                 //String testelerfich =  file.readFile();
@@ -146,9 +151,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 ParaLeitura_GPS();
 
                 btnstart.setEnabled(true);
-               // btnstart.setBackgroundResource(R.color.colorAccent);
+                btnstart.setBackgroundResource(R.drawable.button);
                 btnend.setEnabled(false);
-              //  btnend.setBackgroundResource(R.color.colorcinza);
+                btnend.setBackgroundResource(R.drawable.button_desligado);
             }
         });
 
