@@ -110,9 +110,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     IniciaContagemDe_Tempo();
 
                     btnstart.setEnabled(false);
-                    btnstart.setBackgroundResource(R.color.colorcinza);
+                    //btnstart.setBackgroundResource(R.color.colorcinza);
                     btnend.setEnabled(true);
-                    btnend.setBackgroundResource(R.color.colorAccent);
+                   // btnend.setBackgroundResource(R.color.colorAccent);
 
                 }
                 //String testelerfich =  file.readFile();
@@ -146,9 +146,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 ParaLeitura_GPS();
 
                 btnstart.setEnabled(true);
-                btnstart.setBackgroundResource(R.color.colorAccent);
+               // btnstart.setBackgroundResource(R.color.colorAccent);
                 btnend.setEnabled(false);
-                btnend.setBackgroundResource(R.color.colorcinza);
+              //  btnend.setBackgroundResource(R.color.colorcinza);
             }
         });
 
@@ -344,9 +344,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     return true;
     }
-public void ParaLeitura_GPS(){
-        gps.stopUsingGPS();
-}
+
+    public void ParaLeitura_GPS(){
+            gps.stopUsingGPS();
+    }
+
 
     class Giroscopio implements SensorEventListener {
 
