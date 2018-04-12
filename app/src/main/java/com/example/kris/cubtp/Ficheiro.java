@@ -1,13 +1,9 @@
 package com.example.kris.cubtp;
 
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.provider.Settings;
-import android.widget.Toast;
 
+import android.content.Context;
+import android.widget.Toast;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -22,7 +18,6 @@ public class Ficheiro {
 
     public void saveFile(String text){
         try {
-
             FileOutputStream fos = context.openFileOutput(FileName,Context.MODE_APPEND);
             fos.write(text.getBytes());
             fos.close();

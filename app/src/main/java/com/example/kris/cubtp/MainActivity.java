@@ -39,9 +39,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Button btntranf;
     private TextView textgps;
     private TextView textacelerometro;
-    private SensorManager sensormanager,sensormanager_giro;
-    private Sensor sensor_acel, sensor_giro, sensor_prox, sensor_magne;
-    private SensorEventListener sensoreventlistener, sensoreventlistener1;
+    private SensorManager sensormanager;
     private Ficheiro file;
     private TextView textgiroscopio;
     private TextView titulogiroscopio;
@@ -52,11 +50,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView textproximidade;
     private TextView textorientation;
     private TextView tituloorientacao;
+    private TextView tituloaceleracaolinear;
+    private TextView textoaceleracaolinear;
     private ScrollView scrollView;
-    private boolean tem_acelerometro = false , tem_giroscopio = false, tem_proximidade = false, tem_magnetismo = false;
+    private boolean tem_acelerometro = false , tem_giroscopio = false, tem_proximidade = false, tem_magnetismo = false, tem_linearacel = false;
+    private Sensor sensor_acel, sensor_giro, sensor_prox, sensor_magne, sensor_lineacel;
     final private Giroscopio sens_giro = new Giroscopio();
     final private Proximidade sens_prox = new Proximidade();
     final private GeomagnAcel sens_magnAcel = new GeomagnAcel();
+    final private LinearAcel sens_lineacel = new LinearAcel();
     private String tempo_inicial ="";
     private String tempo_final ="";
     private Thread t;
@@ -68,9 +70,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         file = new Ficheiro(this);
-        file.saveFile("MAE do Grosso\n");
-        file.readFile();
+        file.saveFile("Rosa a poderosa\n");
+        //file.readFile();
         //Toast.makeText(getApplicationContext(),file.readFile(),Toast.LENGTH_LONG).show();
+
 
         // --- FINDVIEWBYID
         titulogps = (TextView) findViewById(R.id.titulogps);
@@ -91,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         tituloorientacao = (TextView) findViewById(R.id.tituloorientacao);
         scrollView = (ScrollView) findViewById(R.id.scrollview);
         verconteudoficheiro = (ImageButton)findViewById(R.id.verconteudofich);
+        tituloaceleracaolinear = (TextView) findViewById(R.id.tituloaceleracaolinear);
+        textoaceleracaolinear = (TextView) findViewById(R.id.textoaceleracaolinear);
 
         btnend.setBackgroundResource(R.drawable.button_desligado);
         btnend.setEnabled(false);
@@ -195,7 +200,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     tituloproximidade.setVisibility(View.VISIBLE);
                     tituloorientacao.setVisibility(View.VISIBLE);
                     textorientation.setVisibility(View.VISIBLE);
+                    tituloaceleracaolinear.setVisibility(View.VISIBLE);
+                    textoaceleracaolinear.setVisibility(View.VISIBLE);
                     scrollView.setVisibility(View.VISIBLE);
+
 
                 }else{
                     textacelerometro.setVisibility(View.INVISIBLE);
@@ -210,6 +218,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     tituloproximidade.setVisibility(View.INVISIBLE);
                     tituloorientacao.setVisibility(View.INVISIBLE);
                     textorientation.setVisibility(View.INVISIBLE);
+                    tituloaceleracaolinear.setVisibility(View.INVISIBLE);
+                    textoaceleracaolinear.setVisibility(View.INVISIBLE);
                     scrollView.setVisibility(View.INVISIBLE);
                 }
 
@@ -271,6 +281,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             tem_magnetismo = true;
         }
 
+        sensor_lineacel = sensormanager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        if(sensor_lineacel==null){
+            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem acelerapção linear",Toast.LENGTH_LONG).show();
+        }else{
+            tem_linearacel=true;
+        }
 
     }
 
@@ -278,6 +294,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // inicia a leitura do sensor
         if(tem_giroscopio){
             sensormanager.registerListener(sens_giro,sensor_giro, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
+        if(tem_linearacel){
+            sensormanager.registerListener(sens_lineacel,sensor_lineacel, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
         if(tem_proximidade) {
@@ -306,6 +326,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if(tem_acelerometro) {
             sensormanager.unregisterListener(sens_magnAcel);
+        }
+
+        if(tem_linearacel) {
+            sensormanager.unregisterListener(sens_lineacel);
         }
     }
 
@@ -411,7 +435,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }
     }
+    class LinearAcel implements SensorEventListener {
 
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            float x ;
+            float y ;
+            float z ;
+
+            x = sensorEvent.values[0];
+            y = sensorEvent.values[1];
+            z = sensorEvent.values[2];
+
+            int acc = sensorEvent.accuracy;
+
+           textoaceleracaolinear.setText("X: "+(int)x+ "   Y: "+(int)y+ "   Z: "+(int)z+"    acc: "+acc, TextView.BufferType.NORMAL);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    }
     class GeomagnAcel implements SensorEventListener {
 
         float[] accelerometerValues = new float[3];
