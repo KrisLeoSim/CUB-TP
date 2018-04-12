@@ -35,9 +35,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Button btntranf;
     private TextView textgps;
     private TextView textacelerometro;
-    private SensorManager sensormanager,sensormanager_giro;
-    private Sensor sensor_acel, sensor_giro, sensor_prox, sensor_magne;
-    private SensorEventListener sensoreventlistener, sensoreventlistener1;
+    private SensorManager sensormanager;
     private Ficheiro file;
     private TextView textgiroscopio;
     private TextView titulogiroscopio;
@@ -49,10 +47,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView textorientation;
     private TextView tituloorientacao;
     private ScrollView scrollView;
-    private boolean tem_acelerometro = false , tem_giroscopio = false, tem_proximidade = false, tem_magnetismo = false;
+    private boolean tem_acelerometro = false , tem_giroscopio = false, tem_proximidade = false, tem_magnetismo = false, tem_linearacel = false;
+    private Sensor sensor_acel, sensor_giro, sensor_prox, sensor_magne, sensor_lineacel;
     final private Giroscopio sens_giro = new Giroscopio();
     final private Proximidade sens_prox = new Proximidade();
     final private GeomagnAcel sens_magnAcel = new GeomagnAcel();
+    final private LinearAcel sens_lineacel = new LinearAcel();
     private String tempo_inicial ="";
     private String tempo_final ="";
     private Thread t;
@@ -63,10 +63,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        file = new Ficheiro(getApplicationContext());
-        file.saveFile("MAE do Grosso\n");
+        file = new Ficheiro(this);
+        file.saveFile("Rosa a poderosa\n");
         Toast.makeText(getApplicationContext(),file.readFile(),Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(),,Toast.LENGTH_LONG).show();
+
 
 
         // --- FINDVIEWBYID
@@ -258,6 +258,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             tem_magnetismo = true;
         }
 
+        sensor_lineacel = sensormanager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        if(sensor_lineacel==null){
+            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem acelerapção linear",Toast.LENGTH_LONG).show();
+        }else{
+            tem_linearacel=true;
+        }
 
     }
 
@@ -265,6 +271,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // inicia a leitura do sensor
         if(tem_giroscopio){
             sensormanager.registerListener(sens_giro,sensor_giro, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
+        if(tem_linearacel){
+            sensormanager.registerListener(sens_lineacel,sensor_lineacel, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
         if(tem_proximidade) {
@@ -293,6 +303,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if(tem_acelerometro) {
             sensormanager.unregisterListener(sens_magnAcel);
+        }
+
+        if(tem_linearacel) {
+            sensormanager.unregisterListener(sens_lineacel);
         }
     }
 
@@ -398,7 +412,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }
     }
+    class LinearAcel implements SensorEventListener {
 
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            float x ;
+            float y ;
+            float z ;
+
+            x = sensorEvent.values[0];
+            y = sensorEvent.values[1];
+            z = sensorEvent.values[2];
+
+            int acc = sensorEvent.accuracy;
+
+           // textlinearacel.setText("X: "+(int)x+ "   Y: "+(int)y+ "   Z: "+(int)z+"    acc: "+acc, TextView.BufferType.NORMAL);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    }
     class GeomagnAcel implements SensorEventListener {
 
         float[] accelerometerValues = new float[3];

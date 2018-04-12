@@ -2,8 +2,10 @@ package com.example.kris.cubtp;
 
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -18,7 +20,6 @@ public class Ficheiro {
 
     public void saveFile(String text){
         try {
-
             FileOutputStream fos = context.openFileOutput(FileName,Context.MODE_APPEND);
             fos.write(text.getBytes());
             fos.close();
