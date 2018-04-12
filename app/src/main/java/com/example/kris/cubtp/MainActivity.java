@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Calendar calendar;
     private SimpleDateFormat simpledateformat;
     private ImageButton verconteudoficheiro;
+    private ImageButton listasensores;
     private TextView textinstante;
     private Button btnstart;
     private Button btnend;
