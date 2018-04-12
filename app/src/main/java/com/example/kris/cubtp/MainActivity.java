@@ -1,6 +1,7 @@
 package com.example.kris.cubtp;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private Calendar calendar;
     private SimpleDateFormat simpledateformat;
+    private ImageButton verconteudoficheiro;
     private TextView textinstante;
     private Button btnstart;
     private Button btnend;
@@ -63,11 +66,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        file = new Ficheiro(getApplicationContext());
+        file = new Ficheiro(this);
         file.saveFile("MAE do Grosso\n");
-        Toast.makeText(getApplicationContext(),file.readFile(),Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(),,Toast.LENGTH_LONG).show();
-
+        file.readFile();
+        //Toast.makeText(getApplicationContext(),file.readFile(),Toast.LENGTH_LONG).show();
 
         // --- FINDVIEWBYID
         titulogps = (TextView) findViewById(R.id.titulogps);
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         textorientation = (TextView) findViewById(R.id.textoorientation);
         tituloorientacao = (TextView) findViewById(R.id.tituloorientacao);
         scrollView = (ScrollView) findViewById(R.id.scrollview);
-
+        verconteudoficheiro = (ImageButton)findViewById(R.id.verconteudofich);
 
         btnend.setBackgroundResource(R.drawable.button_desligado);
         btnend.setEnabled(false);
@@ -99,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnstart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
 
                 //GPS
                 if(LeituraGPS_tracker()){
@@ -117,16 +118,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     btnstart.setBackgroundResource(R.drawable.button_desligado);
                     btnend.setEnabled(true);
                     btnend.setBackgroundResource(R.drawable.button);
-
-
                 }
                 //String testelerfich =  file.readFile();
                 //Toast.makeText(getApplicationContext(),"Leu: "+testelerfich,Toast.LENGTH_LONG).show();
-
-
-
-
-
 
 
             }
@@ -154,6 +148,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 btnstart.setBackgroundResource(R.drawable.button);
                 btnend.setEnabled(false);
                 btnend.setBackgroundResource(R.drawable.button_desligado);
+            }
+        });
+
+        //MOSTRAR O CONTEUDO DO FICHEIRO
+        verconteudoficheiro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Mostraficheiro();
             }
         });
 
@@ -213,6 +215,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+    }
+
+    public void Mostraficheiro(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        // Setting Dialog Title
+        alertDialog.setTitle("Ficheiro CUBTP");
+        // Setting Dialog Message
+        alertDialog.setMessage(file.readFile());
+
+        alertDialog.show();
     }
 
     // --- SABER QUAL A ACTIVIDADE ESCOLHIDA
