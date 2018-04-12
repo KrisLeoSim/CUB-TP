@@ -1,11 +1,9 @@
 package com.example.kris.cubtp;
 
 
-import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
 
-import java.io.File;
+import android.content.Context;
+import android.widget.Toast;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -15,7 +13,7 @@ public class Ficheiro {
     String FileName = "CUBFILE.csv";
 
     public Ficheiro(Context c){
-        context = c;
+        this.context = c;
     }
 
     public void saveFile(String text){
@@ -46,17 +44,6 @@ public class Ficheiro {
         }
 
         return text;
-    }
-
-    public void getdirectoria(){
-        try {
-            FileOutputStream fos = context.openFileOutput(FileName,Context.MODE_APPEND);
-            fos.close();
-            Toast.makeText(context,"Saved!",Toast.LENGTH_LONG).show();
-        }catch (Exception e){
-            e.printStackTrace();
-            Toast.makeText(context,"Erro a salvar o ficheiro",Toast.LENGTH_LONG).show();
-        }
     }
 
 

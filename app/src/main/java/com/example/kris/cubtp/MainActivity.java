@@ -1,6 +1,7 @@
 package com.example.kris.cubtp;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private Calendar calendar;
     private SimpleDateFormat simpledateformat;
+    private ImageButton verconteudoficheiro;
     private TextView textinstante;
     private Button btnstart;
     private Button btnend;
@@ -46,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView textproximidade;
     private TextView textorientation;
     private TextView tituloorientacao;
+    private TextView tituloaceleracaolinear;
+    private TextView textoaceleracaolinear;
     private ScrollView scrollView;
     private boolean tem_acelerometro = false , tem_giroscopio = false, tem_proximidade = false, tem_magnetismo = false, tem_linearacel = false;
     private Sensor sensor_acel, sensor_giro, sensor_prox, sensor_magne, sensor_lineacel;
@@ -65,8 +70,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         file = new Ficheiro(this);
         file.saveFile("Rosa a poderosa\n");
-        Toast.makeText(getApplicationContext(),file.readFile(),Toast.LENGTH_LONG).show();
-
+        //file.readFile();
+        //Toast.makeText(getApplicationContext(),file.readFile(),Toast.LENGTH_LONG).show();
 
 
         // --- FINDVIEWBYID
@@ -87,7 +92,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         textorientation = (TextView) findViewById(R.id.textoorientation);
         tituloorientacao = (TextView) findViewById(R.id.tituloorientacao);
         scrollView = (ScrollView) findViewById(R.id.scrollview);
-
+        verconteudoficheiro = (ImageButton)findViewById(R.id.verconteudofich);
+        tituloaceleracaolinear = (TextView) findViewById(R.id.tituloaceleracaolinear);
+        textoaceleracaolinear = (TextView) findViewById(R.id.textoaceleracaolinear);
 
         btnend.setBackgroundResource(R.drawable.button_desligado);
         btnend.setEnabled(false);
@@ -99,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnstart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
 
                 //GPS
                 if(LeituraGPS_tracker()){
@@ -117,16 +123,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     btnstart.setBackgroundResource(R.drawable.button_desligado);
                     btnend.setEnabled(true);
                     btnend.setBackgroundResource(R.drawable.button);
-
-
                 }
                 //String testelerfich =  file.readFile();
                 //Toast.makeText(getApplicationContext(),"Leu: "+testelerfich,Toast.LENGTH_LONG).show();
-
-
-
-
-
 
 
             }
@@ -154,6 +153,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 btnstart.setBackgroundResource(R.drawable.button);
                 btnend.setEnabled(false);
                 btnend.setBackgroundResource(R.drawable.button_desligado);
+            }
+        });
+
+        //MOSTRAR O CONTEUDO DO FICHEIRO
+        verconteudoficheiro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Mostraficheiro();
             }
         });
 
@@ -192,7 +199,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     tituloproximidade.setVisibility(View.VISIBLE);
                     tituloorientacao.setVisibility(View.VISIBLE);
                     textorientation.setVisibility(View.VISIBLE);
+                    tituloaceleracaolinear.setVisibility(View.VISIBLE);
+                    textoaceleracaolinear.setVisibility(View.VISIBLE);
                     scrollView.setVisibility(View.VISIBLE);
+
 
                 }else{
                     textacelerometro.setVisibility(View.INVISIBLE);
@@ -207,12 +217,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     tituloproximidade.setVisibility(View.INVISIBLE);
                     tituloorientacao.setVisibility(View.INVISIBLE);
                     textorientation.setVisibility(View.INVISIBLE);
+                    tituloaceleracaolinear.setVisibility(View.INVISIBLE);
+                    textoaceleracaolinear.setVisibility(View.INVISIBLE);
                     scrollView.setVisibility(View.INVISIBLE);
                 }
 
             }
         });
 
+    }
+
+    public void Mostraficheiro(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        // Setting Dialog Title
+        alertDialog.setTitle("Ficheiro CUBTP");
+        // Setting Dialog Message
+        alertDialog.setMessage(file.readFile());
+
+        alertDialog.show();
     }
 
     // --- SABER QUAL A ACTIVIDADE ESCOLHIDA
@@ -427,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             int acc = sensorEvent.accuracy;
 
-           // textlinearacel.setText("X: "+(int)x+ "   Y: "+(int)y+ "   Z: "+(int)z+"    acc: "+acc, TextView.BufferType.NORMAL);
+           textoaceleracaolinear.setText("X: "+(int)x+ "   Y: "+(int)y+ "   Z: "+(int)z+"    acc: "+acc, TextView.BufferType.NORMAL);
         }
 
         @Override

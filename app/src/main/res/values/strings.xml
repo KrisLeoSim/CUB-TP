@@ -2,9 +2,9 @@
     <string name="app_name">CUBTP</string>
     <string-array name="actividades_list">
         <item>Andar</item>
-        <item>Correr</item>
-        <item>Subir</item>
-        <item>Descer</item>
         <item>Conduzir</item>
+        <item>Saltar</item>
+        <item>Subir Escadas</item>
+        <item>Descer Escadas</item>
     </string-array>
 </resources>
