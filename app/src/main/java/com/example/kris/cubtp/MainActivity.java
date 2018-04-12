@@ -293,7 +293,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-
     class Giroscopio implements SensorEventListener {
 
         @Override
