@@ -2,8 +2,8 @@ package com.example.kris.cubtp;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,11 +12,9 @@ import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,15 +27,12 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -65,11 +60,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private Calendar calendar;
     private SimpleDateFormat simpledateformat;
-    private ImageButton verconteudoficheiro;
     private TextView textinstante;
     private Button btnstart;
     private Button btnend;
     private Button btntranf;
+    private ImageButton verconteudoficheiro, listarSensores;
     private TextView textgps;
     private TextView textacelerometro;
     private SensorManager sensormanager;
@@ -138,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         tituloorientacao = (TextView) findViewById(R.id.tituloorientacao);
         scrollView = (ScrollView) findViewById(R.id.scrollview);
         verconteudoficheiro = (ImageButton)findViewById(R.id.verconteudofich);
+        listarSensores = (ImageButton) findViewById(R.id.listarsen);
+
         tituloaceleracaolinear = (TextView) findViewById(R.id.tituloaceleracaolinear);
         textoaceleracaolinear = (TextView) findViewById(R.id.textoaceleracaolinear);
         lblLocation = (TextView) findViewById(R.id.textgps);
@@ -154,9 +151,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnstart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if (verificaEstadoDo_GPS()) {
                     //GPS
                     LeituraGPS_tracker();
+
 
                     // inicia a leitura do sensor
                     RegistaSensores();
@@ -175,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     btnend.setEnabled(true);
                     btnend.setBackgroundResource(R.drawable.button);
                 }
+
             }
         });
 
@@ -201,6 +201,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+
+        // --- BUTTON TANSFERIR / LIMPAR FICHEIRO
+        btntranf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+
         //MOSTRAR O CONTEUDO DO FICHEIRO
         verconteudoficheiro.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,13 +219,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-
-        // --- BUTTON TANSFERIR / LIMPAR FICHEIRO
-        btntranf.setOnClickListener(new View.OnClickListener() {
+        // LISTAR OS SENSORES DO DISPOSITIVO
+        listarSensores.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
+                ListarSensores();
             }
         });
 
@@ -289,6 +297,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void Mostraficheiro(){
         d_box.Mostraficheiro();
+    }
+
+    public void ListarSensores(){
+        SensorManager manager = (SensorManager)this.getSystemService(Context.SENSOR_SERVICE);
+        ArrayList<String> lista = new ArrayList();
+        String sensores = "";
+
+        lista =(ArrayList) manager.getSensorList(Sensor.TYPE_ALL);
+
+        for(int i=0; i<lista.size();i++){
+            sensores = (String) sensores.toString() + lista.get(i).toString() + "\n\n";
+        }
+
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        // Setting Dialog Title
+        alertDialog.setTitle("Lista de Sensores do Dispositivo");
+        // Setting Dialog Message
+        alertDialog.setMessage(sensores);
+
+        alertDialog.show();
     }
 
     // --- SABER QUAL A ACTIVIDADE ESCOLHIDA

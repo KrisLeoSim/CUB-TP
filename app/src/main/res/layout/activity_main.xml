@@ -14,13 +14,13 @@
         android:layout_height="52dp"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="4dp" />
+        tools:layout_editor_absoluteY="0dp" />
 
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="26dp"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
@@ -41,7 +41,7 @@
         android:layout_marginTop="8dp"
         android:checked="true"
         app:layout_constraintBottom_toTopOf="@+id/spinneractividades"
-        app:layout_constraintEnd_toStartOf="@+id/divider"
+        app:layout_constraintEnd_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
         tools:checked="true" />
@@ -356,20 +356,20 @@
 
     <View
         android:id="@+id/divider"
-        android:layout_width="5dp"
+        android:layout_width="3dp"
         android:layout_height="0dp"
         android:layout_marginBottom="12dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="4dp"
         android:background="@drawable/button"
         app:layout_constraintBottom_toTopOf="@+id/spinneractividades"
-        app:layout_constraintEnd_toEndOf="@+id/textView"
+        app:layout_constraintEnd_toStartOf="@+id/verconteudofich"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
     <View
         android:id="@+id/divider3"
-        android:layout_width="5dp"
+        android:layout_width="3dp"
         android:layout_height="0dp"
         android:layout_marginBottom="12dp"
         android:layout_marginTop="4dp"
@@ -381,7 +381,7 @@
 
     <View
         android:id="@+id/divider2"
-        android:layout_width="5dp"
+        android:layout_width="3dp"
         android:layout_height="0dp"
         android:layout_marginBottom="12dp"
         android:layout_marginTop="4dp"
@@ -395,7 +395,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="18dp"
         android:background="@android:color/transparent"
         android:tint="@color/colorAccent"
@@ -403,6 +403,20 @@
         app:layout_constraintEnd_toStartOf="@+id/checkBox"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_view" />
+
+    <ImageButton
+        android:id="@+id/listarsen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:tint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="@+id/CustomToolbar"
+        app:layout_constraintEnd_toStartOf="@+id/divider"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_info_details" />
 
 
 </android.support.constraint.ConstraintLayout>
