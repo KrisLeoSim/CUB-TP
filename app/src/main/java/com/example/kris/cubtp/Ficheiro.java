@@ -8,7 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 public class Ficheiro {
-
+    String cabecalho = "lat,log,alt,timestamp,x_acc,y_acc,z_acc,x_gyro,y_gyro,z_gyro,x_pro,azi_ori,pit_ori,roll_ori,x_accl,y_accl,z_accl,activity";
     Context context;
     String FileName = "CUBFILE.csv";
 
@@ -44,6 +44,14 @@ public class Ficheiro {
         }
 
         return text;
+    }
+
+    public String GetNomeFicheiro(){
+        String nomeUnico;
+
+            nomeUnico = "CUB_KS_" + "FALTA POR O GETTIME" + ".csv";
+            //Toast.makeText(context,nomeUnico,Toast.LENGTH_LONG).show();
+        return nomeUnico ;
     }
 
 
