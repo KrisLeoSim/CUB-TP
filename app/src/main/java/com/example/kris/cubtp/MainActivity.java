@@ -2,11 +2,17 @@ package com.example.kris.cubtp;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.GpsStatus;
 import android.location.Location;
+import android.location.LocationManager;
+import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +21,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ScrollView;
@@ -23,11 +30,38 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, LocationListener{
 
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
+
+    private Location mLastLocation;
+    private GoogleApiClient mGoogleApiClient;
+
+    private boolean mRequestLocationUpdates = false;
+    private boolean suporta_gps = false;
+
+    private LocationRequest mLocationRequest;
+
+    private static int UPDATE_INTERVAL = 10000;
+    private static int FATEST_INTERVAL = 5000;
+    private static int DISPLACEMENT = 10;
+
+    private TextView lblLocation;
 
     private Calendar calendar;
     private SimpleDateFormat simpledateformat;
@@ -61,12 +95,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private String tempo_inicial ="";
     private String tempo_final ="";
     private Thread t;
-    private GPS_Tracker gps;
+    private Dialoge_boxes d_box = new Dialoge_boxes(this);
+    private GPS_GOOGLE_API gps_google;
+    private LocationManager locationManager;
+    private Intent intent;
+    private Chronometer simpleChronometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //verifica se +e possivel usar o googleapicliente para fazer uso do gps
+        if(checkPlayServices()) {
+            buildGoogleApiClient();
+            createLocationRequest();
+        }
+
 
         file = new Ficheiro(this);
         file.saveFile("Rosa a poderosa\n");
@@ -95,7 +140,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         verconteudoficheiro = (ImageButton)findViewById(R.id.verconteudofich);
         tituloaceleracaolinear = (TextView) findViewById(R.id.tituloaceleracaolinear);
         textoaceleracaolinear = (TextView) findViewById(R.id.textoaceleracaolinear);
+        lblLocation = (TextView) findViewById(R.id.textgps);
+        simpleChronometer = (Chronometer) findViewById(R.id.simpleChronometer);
 
+       // intent = new Intent(this,gps.class);
         btnend.setBackgroundResource(R.drawable.button_desligado);
         btnend.setEnabled(false);
 
@@ -106,32 +154,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnstart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                //GPS
-                if(LeituraGPS_tracker()){
+                if (verificaEstadoDo_GPS()) {
+                    //GPS
+                    LeituraGPS_tracker();
 
                     // inicia a leitura do sensor
                     RegistaSensores();
 
-                    // OBTEM TEMPO E ATUALIZA TEXTVIEW
 
-                    tempo_inicial = getTempo();
-                    //textinstante.setText("TEMPO: "+tempo_inicial,TextView.BufferType.NORMAL);
+                    // OBTEM TEMPO E ATUALIZA TEXTVIEW
                     IniciaContagemDe_Tempo();
+                    simpleChronometer.setBase(SystemClock.elapsedRealtime());
+                    simpleChronometer.start();
+                    //  simpleChronometer.setFormat("Tempo (%s)");
+
+
 
                     btnstart.setEnabled(false);
                     btnstart.setBackgroundResource(R.drawable.button_desligado);
                     btnend.setEnabled(true);
                     btnend.setBackgroundResource(R.drawable.button);
                 }
-                //String testelerfich =  file.readFile();
-                //Toast.makeText(getApplicationContext(),"Leu: "+testelerfich,Toast.LENGTH_LONG).show();
-
-
             }
         });
-
-
 
         // --- BUTTON PARAR ATIVIDADE
         btnend.setOnClickListener(new View.OnClickListener() {
@@ -140,15 +185,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 // Parar a leitura do acelerometro
                 DesregistaSensores();
 
-               // textinstante.setText("PARADO",TextView.BufferType.NORMAL);
-
-                tempo_final = getTempo();
-                t.interrupt();
-                textinstante.setText("TEMPO: "+tempo_inicial,TextView.BufferType.NORMAL);
-
                 //para GPS
                 ParaLeitura_GPS();
+                t.interrupt();
 
+
+                simpleChronometer.stop();
+                simpleChronometer.setBase(SystemClock.elapsedRealtime());
+
+                limpa_parametros();
                 btnstart.setEnabled(true);
                 btnstart.setBackgroundResource(R.drawable.button);
                 btnend.setEnabled(false);
@@ -169,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btntranf.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
 
             }
         });
@@ -227,14 +273,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    public void Mostraficheiro(){
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-        // Setting Dialog Title
-        alertDialog.setTitle("Ficheiro CUBTP");
-        // Setting Dialog Message
-        alertDialog.setMessage(file.readFile());
+    private void limpa_parametros(){
+        textacelerometro.setText("" , TextView.BufferType.NORMAL);
 
-        alertDialog.show();
+        if(suporta_gps) {
+            textgps.setText("", TextView.BufferType.NORMAL);
+        }
+
+        textinstante.setText("PARADO" , TextView.BufferType.NORMAL);
+        textgiroscopio.setText("" , TextView.BufferType.NORMAL);
+        textproximidade.setText("" , TextView.BufferType.NORMAL);
+        textorientation.setText("" , TextView.BufferType.NORMAL);
+        textoaceleracaolinear.setText("" , TextView.BufferType.NORMAL);
+    }
+
+    public void Mostraficheiro(){
+        d_box.Mostraficheiro();
     }
 
     // --- SABER QUAL A ACTIVIDADE ESCOLHIDA
@@ -246,7 +300,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-
     }
 
     public void InicializaSensores(){
@@ -332,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    public String getTempo(){
+    public String getDataTempo(){
         calendar = Calendar.getInstance();
         simpledateformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         String sDate = (String) simpledateformat.format(calendar.getTime());
@@ -345,49 +398,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void run() {
                 try {
+
+                    tempo_inicial = getDataTempo();
+
                     while (!isInterrupted()) {
                         Thread.sleep(1000);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                //TextView tdate = (TextView) findViewById(R.id.date);
-                                // long date = System.currentTimeMillis();
-                                //SimpleDateFormat sdf = new SimpleDateFormat("MMM dd yyyy\nhh-mm-ss a");
-                                // String dateString = sdf.format(date);
-                                String dateString = getTempo();
-                                // tdate.setText(dateString);
-                                textinstante.setText("TEMPO: "+dateString,TextView.BufferType.NORMAL);
+
+                                String dateString = getDataTempo();
+                                textinstante.setText("DATA: "+dateString,TextView.BufferType.NORMAL);
                             }
                         });
                     }
+
+                    tempo_final = getDataTempo();
+
                 } catch (InterruptedException e) {
                 }
-
             }
-
         };
         t.start();
     }
 
-    public boolean LeituraGPS_tracker(){
-
-        gps = new GPS_Tracker(this);
-        if(gps.canGetLocation()) {
-
-            double latitude = gps.getLatitude();
-            double longitude = gps.getLongitude();
-            double altitude = gps.getAltitude();
-
-            textgps.setText("LAT: "+latitude+"\nLON: "+longitude+"\nALT: "+altitude,TextView.BufferType.NORMAL);
-        }else{
-            gps.showSettingsAlert();
-            return false;
-        }
-    return true;
+    public void LeituraGPS_tracker(){
+       mRequestLocationUpdates = true;
+       startLocationUpdates();
     }
 
     public void ParaLeitura_GPS(){
-            gps.stopUsingGPS();
+        mRequestLocationUpdates = false;
+        stopLocationUpdates();
+            //gps.stopUsingGPS();
     }
 
 
@@ -414,7 +457,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }
     }
-
     class Proximidade implements SensorEventListener {
 
         @Override
@@ -540,6 +582,192 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
+
+
+
+
+
+    private void displayLocation() {
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if(mLastLocation != null ) {
+            double latitude = mLastLocation.getLatitude();
+            double longtitude = mLastLocation.getLongitude();
+            lblLocation.setText("Latitude: " + latitude + "   Longitude: " + longtitude , TextView.BufferType.NORMAL);
+            // lblLocation.setText(latitude + ", " + longtitude);
+        } else {
+
+            lblLocation.setText("GPS não esta activado");
+            d_box.definicoes_GPS();
+        }
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
+
+    }
+
+    private boolean checkPlayServices() {
+
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                lblLocation.setText("Não suportado", TextView.BufferType.NORMAL);
+                //finish();
+            }
+            suporta_gps = false;
+            return false;
+        }
+        suporta_gps = true;
+        return true;
+    }
+
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+    }
+
+    protected boolean verificaEstadoDo_GPS(){
+
+
+        try {
+            locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+
+        }catch(Exception y){
+
+        }
+
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+
+        if (isGPSEnabled) {
+            if (locationManager != null) {
+                // Register GPSStatus listener for events
+                locationManager.addGpsStatusListener(mGPSStatusListener);
+                LocationListener  gpslocationListener = new LocationListener() {
+                    public void onLocationChanged(Location loc) {}
+                    public void onStatusChanged(String provider, int status, Bundle extras) {}
+                    public void onProviderEnabled(String provider) {}
+                    public void onProviderDisabled(String provider) {}
+                };
+            }
+            return true;
+        }else{
+            lblLocation.setText("GPS não esta activado");
+            d_box.definicoes_GPS();
+            return false;
+        }
+    }
+
+    public GpsStatus.Listener mGPSStatusListener = new GpsStatus.Listener() {
+        public void onGpsStatusChanged(int event) {
+            switch(event) {
+                case GpsStatus.GPS_EVENT_STARTED:
+                    Toast.makeText(getApplicationContext(), "GPS_SEARCHING", Toast.LENGTH_SHORT).show();
+                    System.out.println("TAG - GPS searching: ");
+                    break;
+                case GpsStatus.GPS_EVENT_STOPPED:
+                    Toast.makeText(getApplicationContext(), "GPS_STOPED", Toast.LENGTH_SHORT).show();
+                    System.out.println("TAG - GPS Stopped");
+                    break;
+                case GpsStatus.GPS_EVENT_FIRST_FIX:
+
+
+                    Toast.makeText(getApplicationContext(), "GPS_LOCKED", Toast.LENGTH_SHORT).show();
+
+
+
+
+                    break;
+                case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
+                    //                 System.out.println("TAG - GPS_EVENT_SATELLITE_STATUS");
+                    break;
+            }
+        }
+    };
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        /*displayLocation();
+
+        if(mRequestLocationUpdates) {
+            startLocationUpdates();
+        }*/
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation = location;
+
+        Toast.makeText(getApplicationContext(), "Location changed!", Toast.LENGTH_SHORT).show();
+
+        displayLocation();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // Log.i(TAG, "Connection failed: " + connectionResult.getErrorCode());
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        checkPlayServices();
+        if(mGoogleApiClient.isConnected() && mRequestLocationUpdates) {
+            startLocationUpdates();
+        }
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if(mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    /*@Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }*/
 
 
 }

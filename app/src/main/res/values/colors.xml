@@ -6,4 +6,7 @@
     <color name="colorAccent">#ef8354</color>
     <color name="colorcinza">#bfc0c0</color>
     <color name="colormaisclaro">#e8e8e8</color>
+    <color name="view_bg">#c11213</color>
+    <color name="white">#ffffff</color>
+    <color name="btn_bg">#3e4a56</color>
 </resources>

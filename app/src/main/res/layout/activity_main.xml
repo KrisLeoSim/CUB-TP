@@ -176,6 +176,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tituloinstante" />
 
+            <Chronometer
+
+                android:id="@+id/simpleChronometer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textAlignment="center"
+                android:background="#e7e7e7"
+                android:textColor="#000000"
+                android:textSize="25sp"
+                android:textStyle="bold|italic" />
+
             <TextView
                 android:id="@+id/titulogps"
                 android:layout_width="match_parent"
