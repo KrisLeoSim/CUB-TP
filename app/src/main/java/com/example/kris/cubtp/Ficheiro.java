@@ -125,7 +125,7 @@ public class Ficheiro {
 
     public String getDataTempo(){
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat simpledateformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("dd_MM_yyyyHH_mm_ss");
         String sDate = (String) simpledateformat.format(calendar.getTime());
         return sDate;
     }
