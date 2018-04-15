@@ -10,9 +10,9 @@ public class Dialoge_boxes {
     private final Context mContext;
     private final Ficheiro ficheiro;
 
-    public Dialoge_boxes(Context mContext) {
+    public Dialoge_boxes(Context mContext, Ficheiro fich) {
         this.mContext = mContext;
-        this.ficheiro = new Ficheiro(mContext);
+        this.ficheiro = fich;
     }
 
     public void definicoes_GPS(){

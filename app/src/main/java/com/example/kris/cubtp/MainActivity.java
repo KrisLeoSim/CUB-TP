@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private String tempo_inicial ="";
     private String tempo_final ="";
     private Thread t;
-    private Dialoge_boxes d_box = new Dialoge_boxes(this);
+    private Dialoge_boxes d_box;
     private GPS_GOOGLE_API gps_google;
     private LocationManager locationManager;
     private Intent intent;
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         file.saveFile("Rosa a poderosa\n");
         //file.readFile();
         //Toast.makeText(getApplicationContext(),file.readFile(),Toast.LENGTH_LONG).show();
-
+        d_box = new Dialoge_boxes(this, file);
 
         // --- FINDVIEWBYID
         titulogps = (TextView) findViewById(R.id.titulogps);
@@ -301,21 +301,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void ListarSensores(){
         SensorManager manager = (SensorManager)this.getSystemService(Context.SENSOR_SERVICE);
-        ArrayList<String> lista = new ArrayList();
-        String sensores = "";
-
-        lista =(ArrayList) manager.getSensorList(Sensor.TYPE_ALL);
-
-        for(int i=0; i<lista.size();i++){
-            sensores = (String) sensores.toString() + lista.get(i).toString() + "\n\n";
-        }
-
 
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         // Setting Dialog Title
         alertDialog.setTitle("Lista de Sensores do Dispositivo");
         // Setting Dialog Message
-        alertDialog.setMessage(sensores);
+        alertDialog.setMessage(manager.getSensorList(Sensor.TYPE_ALL).toString());
 
         alertDialog.show();
     }

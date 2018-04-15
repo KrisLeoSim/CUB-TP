@@ -14,59 +14,84 @@ import java.util.Calendar;
 
 public class Ficheiro {
 
-    Context context;
-    String FileName;
-    SharedPreferences sharedPref;
-    SharedPreferences.Editor editor;
+    private String cabecalho = "lat,log,alt,timestamp,x_acc,y_acc,z_acc,x_gyro,y_gyro,z_gyro,x_pro,azi_ori,pit_ori,roll_ori,x_accl,y_accl,z_accl,activity";
+    private Context context;
+    private String FileName;
+    final String chave = "nome_fich";
+    private SharedPreferences sharedPref;
+    private SharedPreferences.Editor editor;
+    private int cria = 0;
 
     public Ficheiro(Context c){
         this.context = c;
-        sharedPref= context.getSharedPreferences("myPref", Context.MODE_PRIVATE);
-        editor=sharedPref.edit();
 
+
+        //cria ficheiro e uma verificaçao ele verifica se ha algum ficheiro em memoria
+        //se nao houver cria.o caso esteja apenas recebe o nome do ficheiro que esta a ser alterado
         criaFicheiro();
     }
 
-    public String gera_nome(){
-        //...
-        return FileName;
-    }
-
     private void criaFicheiro(){
-        sharedPref.getString("nome_fich",FileName);
 
-        File file = new File(FileName);
-        if(file.exists()){
-            System.out.println("Ficheiro existe ");
+        sharedPref= context.getSharedPreferences("myPref", Context.MODE_PRIVATE);
+        editor=sharedPref.edit();
 
+        //faz get nome em memoria para ele se voltar a relembrar do ficheiro caso se volte a aplicaçao
+        FileName = sharedPref.getString(chave,FileName);
 
+        //verifica se da para aceder ao ficheiro
+
+        if(FileName != null) {
+            File file = new File(FileName);
+            if (file.exists()) {
+                System.out.println("Ficheiro existe " + FileName);
+                cria = 0;
+            } else {
+                System.out.println("Ficheiro : " + FileName + " nao encontrado ");
+                cria = 1;
+            }
         }else{
-            System.out.println("Not find file ");
+            cria = 1;
+        }
+
+        if(cria == 1){
+            System.out.println("Ficheiro : " + FileName + " nao encontrado ");
             // Save your string in SharedPref
 
-            FileName = gera_nome();
-            //gera nome e guarda
-            editor.putString("nome_fich", FileName);
+
+            //gera nome e guarda na memoria
+            FileName = GetNomeFicheiro();
+            editor.putString(chave, FileName);
             editor.commit();
-            saveFile(gera_nome());
+
+            //add o cabeça-lho
+            saveFile(cabecalho);
+            System.out.println("Criei o ficheiro: " + FileName);
 
         }
-        
-
-
     }
 
     public void enviar_fich(){
 
+        //envia ficheiro
 
+        //apaga e faz um novo
+        apaga_ficheiro();
     }
 
+    public void apaga_ficheiro(){
+        //apaga ficheiro da memoria interna
+        context.deleteFile(FileName);
+
+        //apaga ficheiro da memoria partilhada
+        editor.remove(chave);
+        editor.apply();
+
+        //abre um novo para estar preparado a receber escrita
+        criaFicheiro();
+    }
 
     public void saveFile(String text){
-
-
-
-
 
         try {
             FileOutputStream fos = context.openFileOutput(FileName,Context.MODE_APPEND);
@@ -97,10 +122,23 @@ public class Ficheiro {
         return text;
     }
 
+
     public String getDataTempo(){
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpledateformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         String sDate = (String) simpledateformat.format(calendar.getTime());
         return sDate;
     }
+
+    public String GetNomeFicheiro(){
+        String nomeUnico;
+
+            nomeUnico = "CUB_KS_" + getDataTempo() + ".csv";
+            System.out.println("Gerei o nome: "+ nomeUnico);
+            //Toast.makeText(context,nomeUnico,Toast.LENGTH_LONG).show();
+        return nomeUnico ;
+    }
+
+
+
 }
