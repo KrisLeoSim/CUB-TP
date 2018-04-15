@@ -14,7 +14,7 @@ import java.util.Calendar;
 
 public class Ficheiro {
 
-    private String cabecalho = "lat,log,alt,timestamp,x_acc,y_acc,z_acc,x_gyro,y_gyro,z_gyro,x_pro,azi_ori,pit_ori,roll_ori,x_accl,y_accl,z_accl,activity";
+    private String cabecalho = "lat,log,alt,timestamp,x_acc,y_acc,z_acc,x_gyro,y_gyro,z_gyro,x_pro,azi_ori,pit_ori,roll_ori,x_accl,y_accl,z_accl,activity\n";
     private Context context;
     private String FileName;
     final String chave = "nome_fich";
