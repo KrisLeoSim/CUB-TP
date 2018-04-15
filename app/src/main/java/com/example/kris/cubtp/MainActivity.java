@@ -614,7 +614,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(mLastLocation != null ) {
             double latitude = mLastLocation.getLatitude();
             double longtitude = mLastLocation.getLongitude();
-            lblLocation.setText("Latitude: " + latitude + "   Longitude: " + longtitude , TextView.BufferType.NORMAL);
+            double altitude = mLastLocation.getAltitude();
+            lblLocation.setText("Latitude: " + latitude + "\n   Longitude: " + longtitude +"\n   Altitude: "+ altitude, TextView.BufferType.NORMAL);
             // lblLocation.setText(latitude + ", " + longtitude);
         } else {
 
