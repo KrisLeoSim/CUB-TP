@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -27,6 +28,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +41,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener{
+        GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
@@ -61,34 +63,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Calendar calendar;
     private SimpleDateFormat simpledateformat;
     private TextView textinstante;
-    private Button btnstart;
-    private Button btnend;
-    private Button btntranf;
+    private Button btnstart, btnend, btntranf;
     private ImageButton verconteudoficheiro, listarSensores;
-    private TextView textgps;
-    private TextView textacelerometro;
+    private TextView textgps, textacelerometro;
     private SensorManager sensormanager;
     private Ficheiro file;
-    private TextView textgiroscopio;
-    private TextView titulogiroscopio;
-    private TextView titulogps;
-    private TextView tituloacelerometro;
-    private TextView tituloinstante;
-    private TextView tituloproximidade;
-    private TextView textproximidade;
-    private TextView textorientation;
-    private TextView tituloorientacao;
-    private TextView tituloaceleracaolinear;
-    private TextView textoaceleracaolinear;
+    private TextView textgiroscopio, titulogiroscopio, titulogps, tituloacelerometro, tituloinstante, tituloproximidade, textproximidade, textorientation, tituloorientacao, tituloaceleracaolinear, textoaceleracaolinear;
     private ScrollView scrollView;
-    private boolean tem_acelerometro = false , tem_giroscopio = false, tem_proximidade = false, tem_magnetismo = false, tem_linearacel = false;
+    private boolean tem_acelerometro = false, tem_giroscopio = false, tem_proximidade = false, tem_magnetismo = false, tem_linearacel = false;
     private Sensor sensor_acel, sensor_giro, sensor_prox, sensor_magne, sensor_lineacel;
     final private Giroscopio sens_giro = new Giroscopio();
     final private Proximidade sens_prox = new Proximidade();
     final private GeomagnAcel sens_magnAcel = new GeomagnAcel();
     final private LinearAcel sens_lineacel = new LinearAcel();
-    private String tempo_inicial ="";
-    private String tempo_final ="";
+    private String tempo_inicial = "";
+    private String tempo_final = "";
     private Thread t;
     private Dialoge_boxes d_box;
     private GPS_GOOGLE_API gps_google;
@@ -96,13 +85,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Intent intent;
     private Chronometer simpleChronometer;
 
+    // PARA GUARDAR AS INFORMAÇOES QUE VAO PARA O FICHEIRO
+    private Double lat, log, alt;
+    private String timestamp;
+    private float x_acc, y_acc, z_acc;
+    private float x_gyro, y_gyro, z_gyro;
+    private float x_pro;
+    private float azi_ori, pit_ori, roll_ori;
+    private float x_accl, y_accl, z_accl;
+    private String activity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         //verifica se +e possivel usar o googleapicliente para fazer uso do gps
-        if(checkPlayServices()) {
+        if (checkPlayServices()) {
             buildGoogleApiClient();
             createLocationRequest();
         }
@@ -132,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         textorientation = (TextView) findViewById(R.id.textoorientation);
         tituloorientacao = (TextView) findViewById(R.id.tituloorientacao);
         scrollView = (ScrollView) findViewById(R.id.scrollview);
-        verconteudoficheiro = (ImageButton)findViewById(R.id.verconteudofich);
+        verconteudoficheiro = (ImageButton) findViewById(R.id.verconteudofich);
         listarSensores = (ImageButton) findViewById(R.id.listarsen);
 
         tituloaceleracaolinear = (TextView) findViewById(R.id.tituloaceleracaolinear);
@@ -140,14 +139,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         lblLocation = (TextView) findViewById(R.id.textgps);
         simpleChronometer = (Chronometer) findViewById(R.id.simpleChronometer);
 
-       // intent = new Intent(this,gps.class);
+        // intent = new Intent(this,gps.class);
         btnend.setBackgroundResource(R.drawable.button_desligado);
         btnend.setEnabled(false);
 
         InicializaSensores();
 
         // --- BUTTON INICIAR ATIVIDADE
-        ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},123);
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
         btnstart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -166,7 +165,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     simpleChronometer.setBase(SystemClock.elapsedRealtime());
                     simpleChronometer.start();
                     //  simpleChronometer.setFormat("Tempo (%s)");
-
 
 
                     btnstart.setEnabled(false);
@@ -229,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
         // --- TRATAMENTO DO SPINNER --- METER NUMA FUNÇAO
-        ArrayAdapter<CharSequence> adapterspinner = ArrayAdapter.createFromResource(this,R.array.actividades_list,R.layout.support_simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> adapterspinner = ArrayAdapter.createFromResource(this, R.array.actividades_list, R.layout.support_simple_spinner_dropdown_item);
         adapterspinner.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         spinner.setAdapter(adapterspinner);
         spinner.setOnItemSelectedListener(this);
@@ -240,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
 
-                if(isChecked == true) {
+                if (isChecked == true) {
                     textacelerometro.setVisibility(View.VISIBLE);
                     textgps.setVisibility(View.VISIBLE);
                     textinstante.setVisibility(View.VISIBLE);
@@ -258,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     scrollView.setVisibility(View.VISIBLE);
 
 
-                }else{
+                } else {
                     textacelerometro.setVisibility(View.INVISIBLE);
                     textgps.setVisibility(View.INVISIBLE);
                     textinstante.setVisibility(View.INVISIBLE);
@@ -281,26 +279,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    private void limpa_parametros(){
-        textacelerometro.setText("" , TextView.BufferType.NORMAL);
+    private void limpa_parametros() {
+        textacelerometro.setText("", TextView.BufferType.NORMAL);
 
-        if(suporta_gps) {
+        if (suporta_gps) {
             textgps.setText("", TextView.BufferType.NORMAL);
         }
 
-        textinstante.setText("PARADO" , TextView.BufferType.NORMAL);
-        textgiroscopio.setText("" , TextView.BufferType.NORMAL);
-        textproximidade.setText("" , TextView.BufferType.NORMAL);
-        textorientation.setText("" , TextView.BufferType.NORMAL);
-        textoaceleracaolinear.setText("" , TextView.BufferType.NORMAL);
+        textinstante.setText("PARADO", TextView.BufferType.NORMAL);
+        textgiroscopio.setText("", TextView.BufferType.NORMAL);
+        textproximidade.setText("", TextView.BufferType.NORMAL);
+        textorientation.setText("", TextView.BufferType.NORMAL);
+        textoaceleracaolinear.setText("", TextView.BufferType.NORMAL);
     }
 
-    public void Mostraficheiro(){
+    public void Mostraficheiro() {
         d_box.Mostraficheiro();
     }
 
-    public void ListarSensores(){
-        SensorManager manager = (SensorManager)this.getSystemService(Context.SENSOR_SERVICE);
+    public void ListarSensores() {
+        SensorManager manager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
 
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         // Setting Dialog Title
@@ -315,105 +313,123 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         String ActividadeSelecionada = adapterView.getItemAtPosition(i).toString();
-        Toast.makeText(adapterView.getContext(),ActividadeSelecionada,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(adapterView.getContext(), ActividadeSelecionada, Toast.LENGTH_SHORT).show();
+        if (ActividadeSelecionada == "Andar"){
+            activity="WALKING";
+        }else{
+            if(ActividadeSelecionada == "Conduzir"){
+                activity="DRIVING";
+            }else{
+                if(ActividadeSelecionada == "Saltar"){
+                    activity="JUMP";
+                }else{
+                    if(ActividadeSelecionada == "Subir Escadas"){
+                        activity="GO_UPSTAIRS";
+                    }
+                    else{ // igual a descer escadas
+                        activity="GO_DOWNSTAIRS";
+                    }
+                }
+            }
+        }
+
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
     }
 
-    public void InicializaSensores(){
+    public void InicializaSensores() {
         sensormanager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         sensor_acel = sensormanager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if(sensor_acel==null){
-            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem Acelerometro",Toast.LENGTH_LONG).show();
-        }else{
-            tem_acelerometro=true;
+        if (sensor_acel == null) {
+            Toast.makeText(getApplicationContext(), "O Dispositivo nao tem Acelerometro", Toast.LENGTH_LONG).show();
+        } else {
+            tem_acelerometro = true;
         }
 
         sensor_giro = sensormanager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        if(sensor_giro==null){
-            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem Giroscopio",Toast.LENGTH_LONG).show();
-        }else{
-            tem_giroscopio=true;
+        if (sensor_giro == null) {
+            Toast.makeText(getApplicationContext(), "O Dispositivo nao tem Giroscopio", Toast.LENGTH_LONG).show();
+        } else {
+            tem_giroscopio = true;
         }
 
         sensor_prox = sensormanager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-        if(sensor_prox==null){
-            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem Proximidade",Toast.LENGTH_LONG).show();
-        }else{
-            tem_proximidade=true;
+        if (sensor_prox == null) {
+            Toast.makeText(getApplicationContext(), "O Dispositivo nao tem Proximidade", Toast.LENGTH_LONG).show();
+        } else {
+            tem_proximidade = true;
         }
 
         sensor_magne = sensormanager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        if(sensor_magne==null){
-            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem Magnetic_Field",Toast.LENGTH_LONG).show();
-        }else{
+        if (sensor_magne == null) {
+            Toast.makeText(getApplicationContext(), "O Dispositivo nao tem Magnetic_Field", Toast.LENGTH_LONG).show();
+        } else {
             tem_magnetismo = true;
         }
 
         sensor_lineacel = sensormanager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        if(sensor_lineacel==null){
-            Toast.makeText(getApplicationContext(),"O Dispositivo nao tem acelerapção linear",Toast.LENGTH_LONG).show();
-        }else{
-            tem_linearacel=true;
+        if (sensor_lineacel == null) {
+            Toast.makeText(getApplicationContext(), "O Dispositivo nao tem acelerapção linear", Toast.LENGTH_LONG).show();
+        } else {
+            tem_linearacel = true;
         }
 
     }
 
-    public void RegistaSensores(){
+    public void RegistaSensores() {
         // inicia a leitura do sensor
-        if(tem_giroscopio){
-            sensormanager.registerListener(sens_giro,sensor_giro, SensorManager.SENSOR_DELAY_NORMAL);
+        if (tem_giroscopio) {
+            sensormanager.registerListener(sens_giro, sensor_giro, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
-        if(tem_linearacel){
-            sensormanager.registerListener(sens_lineacel,sensor_lineacel, SensorManager.SENSOR_DELAY_NORMAL);
+        if (tem_linearacel) {
+            sensormanager.registerListener(sens_lineacel, sensor_lineacel, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
-        if(tem_proximidade) {
+        if (tem_proximidade) {
             sensormanager.registerListener(sens_prox, sensor_prox, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
-        if(tem_magnetismo && tem_acelerometro) {
+        if (tem_magnetismo && tem_acelerometro) {
             sensormanager.registerListener(sens_magnAcel, sensor_acel, SensorManager.SENSOR_DELAY_NORMAL);
             sensormanager.registerListener(sens_magnAcel, sensor_magne, SensorManager.SENSOR_DELAY_NORMAL);
-        }else{
-            if(tem_acelerometro) {
+        } else {
+            if (tem_acelerometro) {
                 sensormanager.registerListener(sens_magnAcel, sensor_acel, SensorManager.SENSOR_DELAY_NORMAL);
             }
         }
     }
 
-    public void DesregistaSensores(){
+    public void DesregistaSensores() {
         // para a leitura do sensor
-        if(tem_giroscopio){
+        if (tem_giroscopio) {
             sensormanager.unregisterListener(sens_giro);
         }
 
-        if(tem_proximidade) {
+        if (tem_proximidade) {
             sensormanager.unregisterListener(sens_prox);
         }
 
-        if(tem_acelerometro) {
+        if (tem_acelerometro) {
             sensormanager.unregisterListener(sens_magnAcel);
         }
 
-        if(tem_linearacel) {
+        if (tem_linearacel) {
             sensormanager.unregisterListener(sens_lineacel);
         }
     }
 
-    public String getDataTempo(){
+    public String getDataTempo() {
         calendar = Calendar.getInstance();
         simpledateformat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String sDate = (String) simpledateformat.format(calendar.getTime());
-        return sDate;
+        timestamp = (String) simpledateformat.format(calendar.getTime());
+        return timestamp;
     }
 
-
-    public void IniciaContagemDe_Tempo(){
+    public void IniciaContagemDe_Tempo() {
         t = new Thread() {
             @Override
             public void run() {
@@ -428,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             public void run() {
 
                                 String dateString = getDataTempo();
-                                textinstante.setText("DATA: "+dateString,TextView.BufferType.NORMAL);
+                                textinstante.setText("DATA: " + dateString, TextView.BufferType.NORMAL);
                             }
                         });
                     }
@@ -442,34 +458,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         t.start();
     }
 
-    public void LeituraGPS_tracker(){
-       mRequestLocationUpdates = true;
-       startLocationUpdates();
+    public void LeituraGPS_tracker() {
+        mRequestLocationUpdates = true;
+        startLocationUpdates();
     }
 
-    public void ParaLeitura_GPS(){
+    public void ParaLeitura_GPS() {
         mRequestLocationUpdates = false;
         stopLocationUpdates();
-            //gps.stopUsingGPS();
+        //gps.stopUsingGPS();
     }
-
 
     class Giroscopio implements SensorEventListener {
 
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
 
-            float x ;
-            float y ;
-            float z ;
-
-            x = sensorEvent.values[0];
-            y = sensorEvent.values[1];
-            z = sensorEvent.values[2];
+            x_gyro = sensorEvent.values[0];
+            y_gyro = sensorEvent.values[1];
+            z_gyro = sensorEvent.values[2];
 
             int acc = sensorEvent.accuracy;
 
-            textgiroscopio.setText("X: "+(int)x+ "   Y: "+(int)y+ "   Z: "+(int)z+"    acc: "+acc, TextView.BufferType.NORMAL);
+            textgiroscopio.setText("X: " + (int) x_gyro + "   Y: " + (int) y_gyro + "   Z: " + (int) z_gyro + "    acc: " + acc, TextView.BufferType.NORMAL);
         }
 
         @Override
@@ -477,18 +488,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }
     }
+
     class Proximidade implements SensorEventListener {
 
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
 
-            float x= sensorEvent.values[0];
+            x_pro = sensorEvent.values[0];
             //float val =  sensorEvent.sensor.getMaximumRange();
 
 
             int acc = sensorEvent.accuracy;
 
-            textproximidade.setText("X: "+(int)x+" cm "+"    acc: "+acc, TextView.BufferType.NORMAL);
+            textproximidade.setText("X: " + (int) x_pro + " cm " + "    acc: " + acc, TextView.BufferType.NORMAL);
         }
 
         @Override
@@ -496,22 +508,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }
     }
+
     class LinearAcel implements SensorEventListener {
 
 
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
-            float x ;
-            float y ;
-            float z ;
 
-            x = sensorEvent.values[0];
-            y = sensorEvent.values[1];
-            z = sensorEvent.values[2];
+            x_accl = sensorEvent.values[0];
+            y_accl = sensorEvent.values[1];
+            z_accl = sensorEvent.values[2];
 
             int acc = sensorEvent.accuracy;
 
-           textoaceleracaolinear.setText("X: "+(int)x+ "   Y: "+(int)y+ "   Z: "+(int)z+"    acc: "+acc, TextView.BufferType.NORMAL);
+            textoaceleracaolinear.setText("X: " + (int) x_accl + "   Y: " + (int) y_accl + "   Z: " + (int) z_accl + "    acc: " + acc, TextView.BufferType.NORMAL);
         }
 
         @Override
@@ -519,6 +529,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }
     }
+
     class GeomagnAcel implements SensorEventListener {
 
         float[] accelerometerValues = new float[3];
@@ -531,7 +542,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             switch (sensorEvent.sensor.getType()) {
 
                 case Sensor.TYPE_ACCELEROMETER:
-                    accelerometerValues   = sensorEvent.values.clone();
+                    accelerometerValues = sensorEvent.values.clone();
                     break;
                 case Sensor.TYPE_MAGNETIC_FIELD:
                     geomagneticMatrix = sensorEvent.values.clone();
@@ -549,48 +560,36 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 boolean sucesso = SensorManager.getRotationMatrix(R, null, accelerometerValues, geomagneticMatrix);
 
-                if(sucesso) {
+                if (sucesso) {
                     float[] actual_orientation = new float[3];
                     SensorManager.getOrientation(R, actual_orientation);
 
-                    float x = accelerometerValues[0];
-                    float y = accelerometerValues[1];
-                    float z = accelerometerValues[2];
+                    x_acc = accelerometerValues[0];
+                    y_acc = accelerometerValues[1];
+                    z_acc = accelerometerValues[2];
 
-                    textacelerometro.setText("X: " + (int) x + "   Y: " + (int) y + "   Z: " + (int) z + "    acc: ", TextView.BufferType.NORMAL);
+                    textacelerometro.setText("XX: " + (int) x_acc + "   Y: " + (int) y_acc + "   Z: " + (int) z_acc + "    acc: ", TextView.BufferType.NORMAL);
 
                     //floatXTotal += accelerometerValues[0];
                     //tvXTotal.setText(floatXTotal + "");
 
+                    azi_ori = actual_orientation[0];
+                    pit_ori = actual_orientation[1];
+                    roll_ori = actual_orientation[2];
 
-                    float azimuth_angle = actual_orientation[0];
-                    float pitch_angle = actual_orientation[1];
-                    float roll_angle = actual_orientation[2];
-
-
-                    textorientation.setText("Azimuth: " +(int) azimuth_angle + "   pitch: " + (int) pitch_angle + "   roll: " + (int) roll_angle, TextView.BufferType.NORMAL);
+                    textorientation.setText("Azimuth: " + (int) azi_ori + "   pitch: " + (int) pit_ori + "   roll: " + (int) roll_ori, TextView.BufferType.NORMAL);
                 }
-            }else{
+            } else {
 
-                if(accelerometerValues != null) {
+                if (accelerometerValues != null) {
 
-                    float x;
-                    float y;
-                    float z;
+                    x_acc = sensorEvent.values[0];
+                    y_acc = sensorEvent.values[1];
+                    z_acc = sensorEvent.values[2];
 
-                    x = sensorEvent.values[0];
-                    y = sensorEvent.values[1];
-                    z = sensorEvent.values[2];
-
-                    textacelerometro.setText("X: " + (int) x + "   Y: " + (int) y + "   Z: " + (int) z + "    acc: ", TextView.BufferType.NORMAL);
+                    textacelerometro.setText("X: " + (int) x_acc + "   Y: " + (int) y_acc + "   Z: " + (int) z_acc + "    acc: ", TextView.BufferType.NORMAL);
                 }
             }
-
-
-
-
-
-
 
 
         }
@@ -601,21 +600,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-
-
-
-
-
-
     private void displayLocation() {
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-        if(mLastLocation != null ) {
-            double latitude = mLastLocation.getLatitude();
-            double longtitude = mLastLocation.getLongitude();
-            double altitude = mLastLocation.getAltitude();
-            lblLocation.setText("Latitude: " + latitude + "\n   Longitude: " + longtitude +"\n   Altitude: "+ altitude, TextView.BufferType.NORMAL);
+        if (mLastLocation != null) {
+            lat = mLastLocation.getLatitude();
+            log = mLastLocation.getLongitude();
+            alt = mLastLocation.getAltitude();
+            lblLocation.setText("Latitude: " + lat + "\n   Longitude: " + log + "\n   Altitude: " + alt, TextView.BufferType.NORMAL);
             // lblLocation.setText(latitude + ", " + longtitude);
         } else {
 
@@ -667,13 +660,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
-    protected boolean verificaEstadoDo_GPS(){
+    protected boolean verificaEstadoDo_GPS() {
 
 
         try {
             locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 
-        }catch(Exception y){
+        } catch (Exception y) {
 
         }
 
@@ -682,7 +675,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if (isGPSEnabled) {
             if (locationManager != null) {
-                // Register GPSStatus listener for events
                 locationManager.addGpsStatusListener(mGPSStatusListener);
                 LocationListener  gpslocationListener = new LocationListener() {
                     public void onLocationChanged(Location loc) {}
@@ -712,11 +704,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     break;
                 case GpsStatus.GPS_EVENT_FIRST_FIX:
 
-
                     Toast.makeText(getApplicationContext(), "GPS_LOCKED", Toast.LENGTH_SHORT).show();
-
-
-
 
                     break;
                 case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
@@ -755,7 +743,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // Log.i(TAG, "Connection failed: " + connectionResult.getErrorCode());
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -774,7 +761,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-
     @Override
     protected void onStop() {
         super.onStop();
@@ -789,6 +775,4 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onPause();
         stopLocationUpdates();
     }*/
-
-
 }
