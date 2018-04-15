@@ -301,21 +301,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void ListarSensores(){
         SensorManager manager = (SensorManager)this.getSystemService(Context.SENSOR_SERVICE);
-        ArrayList<String> lista = new ArrayList();
-        String sensores = "";
-
-        lista =(ArrayList) manager.getSensorList(Sensor.TYPE_ALL);
-
-        for(int i=0; i<lista.size();i++){
-            sensores = (String) sensores.toString() + lista.get(i).toString() + "\n\n";
-        }
-
 
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         // Setting Dialog Title
         alertDialog.setTitle("Lista de Sensores do Dispositivo");
         // Setting Dialog Message
-        alertDialog.setMessage(sensores);
+        alertDialog.setMessage(manager.getSensorList(Sensor.TYPE_ALL).toString());
 
         alertDialog.show();
     }
