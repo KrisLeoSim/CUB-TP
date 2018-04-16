@@ -9,6 +9,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.LineNumberReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -21,6 +22,7 @@ public class Ficheiro {
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor editor;
     private int cria = 0;
+    private int nlinhas;
 
     public Ficheiro(Context c){
         this.context = c;
