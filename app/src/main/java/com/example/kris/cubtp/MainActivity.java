@@ -644,32 +644,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         });
                     }
 
-                  if(!lista_strings_1.isEmpty()){
-                      System.out.println("LISTA 1 nao esta vazia e tem tamanho :" + lista_strings_1.size());
-                      transfere_Dados_Para_Ficheiro(lista_strings_1);
-                      lista_strings_1.clear();
-                    }else{
-                      System.out.println("LISTA 1 limpo :" + lista_strings_1.size());
-                  }
 
-                if(!lista_strings_2.isEmpty()){
-                    System.out.println("LISTA 2 nao esta vazia e tem tamanho :" + lista_strings_2.size());
-                    transfere_Dados_Para_Ficheiro(lista_strings_2);
-                    lista_strings_2.clear();
-                }else{
-                    System.out.println("LISTA 2 limpo :" + lista_strings_2.size());
-                }
 
 
                 } catch (InterruptedException e) {
+                }finally {
+                    transfere_resto();
                 }
             }
         };
         t_trans.start();
     }
 
-    public void transfere_Dados_Para_Ficheiro(ArrayList<String> lista){
 
+    public void transfere_resto(){
+        if(!lista_strings_1.isEmpty()){
+            System.out.println("LISTA 1 nao esta vazia e tem tamanho :" + lista_strings_1.size());
+            transfere_Dados_Para_Ficheiro(lista_strings_1);
+            lista_strings_1.clear();
+        }else{
+            System.out.println("LISTA 1 limpo :" + lista_strings_1.size());
+        }
+
+        if(!lista_strings_2.isEmpty()){
+            System.out.println("LISTA 2 nao esta vazia e tem tamanho :" + lista_strings_2.size());
+            transfere_Dados_Para_Ficheiro(lista_strings_2);
+            lista_strings_2.clear();
+        }else{
+            System.out.println("LISTA 2 limpo :" + lista_strings_2.size());
+        }
+
+    }
+
+    public void transfere_Dados_Para_Ficheiro(ArrayList<String> lista){
         for(int i=0; i<lista.size();i++)
         {
             file.saveFile(lista.get(i));
