@@ -616,7 +616,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-
     public void IniciaTransferencia_ParaFicheiro() {
         t_trans = new Thread() {
             @Override
@@ -659,7 +658,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         };
         t_trans.start();
     }
-
 
     public void transfere_resto(){
         if(!lista_strings_1.isEmpty()){

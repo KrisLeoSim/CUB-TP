@@ -99,19 +99,43 @@ public class Ficheiro {
         criaFicheiro();
     }
 
-    public int numeroRegistos(){
-        int count = 0;
+    public String numeroRegistos(){
+        int cAndar = 0,cConduzir = 0, cSaltar = 0, cSubir = 0, cDescer = 0;
+        String resultaro = "";
         try{
             FileInputStream fis = context.openFileInput(FileName);
             BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-            while ( br.readLine() != null)   {
-                count++;
+            while ( br.readLine() != null){
+                if ( br.readLine().contains("WALKING")){
+                    cAndar++;
+                }else{
+                    if( br.readLine().contains("DRIVING")){
+                        cConduzir++;
+                    }else{
+                        if(br.readLine().contains("JUMP")){
+                            cSaltar++;
+                        }else{
+                            if(br.readLine().contains("GO_UPSTAIRS")){
+                                cSubir++;
+                            }
+                            else{ // igual a descer escadas
+                                if(br.readLine().contains("GO_DOWNSTAIRS")) {
+                                    cDescer++;
+                                }else{
+                                    // é o cabeçalho
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
             Toast.makeText(context,"Erro a ler o ficheiro",Toast.LENGTH_LONG).show();
         }
-        return count-1;
+
+        resultaro = "  Andar (" + cAndar + ")" + "\n" + "  Conduzir (" + cConduzir + ")" + "\n" + "  Saltar (" + cSaltar + ")" + "\n" + "  Subir Escadas (" + cSubir + ")" + "\n" + "  Descer Escadas (" + cDescer + ")";
+        return resultaro;
     }
 
 
