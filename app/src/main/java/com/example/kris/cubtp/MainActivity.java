@@ -94,7 +94,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private float azi_ori, pit_ori, roll_ori;
     private float x_accl, y_accl, z_accl;
     private String activity;
-
+    private ArrayList<String> lista_strings_1 = new ArrayList<>();
+    private ArrayList<String> lista_strings_2= new ArrayList<>();
+    private boolean indicador= true;
+    private Thread t_trans;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,8 +165,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     // OBTEM TEMPO E ATUALIZA TEXTVIEW
                     IniciaContagemDe_Tempo();
+                    //inicia a transferencia de dados para o ficheiro
+                    IniciaTransferencia_ParaFicheiro();
+
                     simpleChronometer.setBase(SystemClock.elapsedRealtime());
                     simpleChronometer.start();
+
+
                     //  simpleChronometer.setFormat("Tempo (%s)");
 
 
@@ -186,6 +194,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 //para GPS
                 ParaLeitura_GPS();
                 t.interrupt();
+                t_trans.interrupt();
+
 
 
                 simpleChronometer.stop();
@@ -578,6 +588,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     roll_ori = actual_orientation[2];
 
                     textorientation.setText("Azimuth: " + (int) azi_ori + "   pitch: " + (int) pit_ori + "   roll: " + (int) roll_ori, TextView.BufferType.NORMAL);
+
+                    armazena_string();
                 }
             } else {
 
@@ -598,6 +610,83 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         public void onAccuracyChanged(Sensor sensor, int i) {
 
         }
+    }
+
+
+    public void IniciaTransferencia_ParaFicheiro() {
+        t_trans = new Thread() {
+            @Override
+            public void run() {
+                try {
+
+
+
+                    while (!isInterrupted()) {
+                        Thread.sleep(5000);
+                        if (indicador) {
+                        indicador= false;
+                        }else{indicador = true;}
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(indicador){
+                                    System.out.println("LISTA 1 a ser transferida tamanho :" + lista_strings_1.size());
+                                    transfere_Dados_Para_Ficheiro(lista_strings_1);
+                                    lista_strings_1.clear();
+                                }else{
+                                    System.out.println("LISTA 2 a ser transferida tamanho :" + lista_strings_2.size());
+                                    transfere_Dados_Para_Ficheiro(lista_strings_2);
+                                    lista_strings_2.clear();
+                                }
+
+                            }
+                        });
+                    }
+
+                  if(!lista_strings_1.isEmpty()){
+                      System.out.println("LISTA 1 nao esta vazia e tem tamanho :" + lista_strings_1.size());
+                      transfere_Dados_Para_Ficheiro(lista_strings_1);
+                      lista_strings_1.clear();
+                    }else{
+                      System.out.println("LISTA 1 limpo :" + lista_strings_1.size());
+                  }
+
+                if(!lista_strings_2.isEmpty()){
+                    System.out.println("LISTA 2 nao esta vazia e tem tamanho :" + lista_strings_2.size());
+                    transfere_Dados_Para_Ficheiro(lista_strings_2);
+                    lista_strings_2.clear();
+                }else{
+                    System.out.println("LISTA 2 limpo :" + lista_strings_2.size());
+                }
+
+
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+        t_trans.start();
+    }
+
+    public void transfere_Dados_Para_Ficheiro(ArrayList<String> lista){
+
+        for(int i=0; i<lista.size();i++)
+        {
+            file.saveFile(lista.get(i));
+        }
+    }
+
+    public void armazena_string(){
+        if(!indicador){
+            lista_strings_1.add(linhaDeDados());
+        }else{
+            lista_strings_2.add(linhaDeDados());
+        }
+
+    }
+
+    public String linhaDeDados (){
+        return  lat +","+ log +","+ alt +","+ timestamp +","+ x_acc +","+ y_acc +","+ z_acc +","+ x_gyro +","+ y_gyro +","+ z_gyro +","+ x_pro +","+ azi_ori +","+ pit_ori +","+ roll_ori +","+ x_accl  +","+ y_accl  +","+ z_accl  +","+ activity;
     }
 
     private void displayLocation() {

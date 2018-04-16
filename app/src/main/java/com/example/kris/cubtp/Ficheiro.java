@@ -97,7 +97,7 @@ public class Ficheiro {
             FileOutputStream fos = context.openFileOutput(FileName,Context.MODE_APPEND);
             fos.write(text.getBytes());
             fos.close();
-            Toast.makeText(context,"Saved!",Toast.LENGTH_LONG).show();
+            //Toast.makeText(context,"Saved!",Toast.LENGTH_LONG).show();
         }catch (Exception e){
             e.printStackTrace();
             Toast.makeText(context,"Erro a salvar o ficheiro",Toast.LENGTH_LONG).show();
