@@ -45,6 +45,8 @@ public class Ficheiro {
 
         if(FileName != null) {
             File file = new File(FileName);
+
+
             if (file.exists()) {
                 System.out.println("Ficheiro existe " + FileName);
                 cria = 0;
@@ -114,6 +116,8 @@ public class Ficheiro {
             int size = fis.available();
             byte[] buffer = new byte[size];
             fis.read(buffer);
+
+
             fis.close();
             text = new String(buffer);
         }catch (Exception e){

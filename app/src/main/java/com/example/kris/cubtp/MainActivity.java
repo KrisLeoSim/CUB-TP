@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btntranf.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                file.apaga_ficheiro();
             }
         });
 
