@@ -53,7 +53,7 @@ public class Dialoge_boxes {
         alertDialog.setTitle("Ficheiro CUBTP");
         // Setting Dialog Message
 
-        alertDialog.setMessage("Nuemro de Registos: \n"+ficheiro.numeroRegistos());
+        alertDialog.setMessage("Numero de Registos: \n"+ficheiro.numeroRegistos());
         //+"\n\n" + ficheiro.readFile()
 
         alertDialog.show();
