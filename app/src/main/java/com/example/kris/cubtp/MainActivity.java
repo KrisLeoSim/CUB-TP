@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
         file = new Ficheiro(this);
-        file.saveFile("Rosa a poderosa\n");
         //file.readFile();
         //Toast.makeText(getApplicationContext(),file.readFile(),Toast.LENGTH_LONG).show();
         d_box = new Dialoge_boxes(this, file);
@@ -324,16 +323,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         String ActividadeSelecionada = adapterView.getItemAtPosition(i).toString();
         //Toast.makeText(adapterView.getContext(), ActividadeSelecionada, Toast.LENGTH_SHORT).show();
-        if (ActividadeSelecionada == "Andar"){
+        if (ActividadeSelecionada.equals("Andar")){
             activity="WALKING";
         }else{
-            if(ActividadeSelecionada == "Conduzir"){
+            if(ActividadeSelecionada.equals("Conduzir")){
                 activity="DRIVING";
             }else{
-                if(ActividadeSelecionada == "Saltar"){
+                if(ActividadeSelecionada.equals("Saltar")){
                     activity="JUMP";
                 }else{
-                    if(ActividadeSelecionada == "Subir Escadas"){
+                    if(ActividadeSelecionada.equals("Subir Escadas")){
                         activity="GO_UPSTAIRS";
                     }
                     else{ // igual a descer escadas
