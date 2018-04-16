@@ -693,7 +693,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public String linhaDeDados (){
-        return  lat +","+ log +","+ alt +","+ timestamp +","+ x_acc +","+ y_acc +","+ z_acc +","+ x_gyro +","+ y_gyro +","+ z_gyro +","+ x_pro +","+ azi_ori +","+ pit_ori +","+ roll_ori +","+ x_accl  +","+ y_accl  +","+ z_accl  +","+ activity;
+        return  lat +","+ log +","+ alt +","+ timestamp +","+ x_acc +","+ y_acc +","+ z_acc +","+ x_gyro +","+ y_gyro +","+ z_gyro +","+ x_pro +","+ azi_ori +","+ pit_ori +","+ roll_ori +","+ x_accl  +","+ y_accl  +","+ z_accl  +","+ activity+"\n";
     }
 
     private void displayLocation() {
