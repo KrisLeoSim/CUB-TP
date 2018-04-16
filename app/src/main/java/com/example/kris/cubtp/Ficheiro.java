@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -94,6 +96,22 @@ public class Ficheiro {
         //abre um novo para estar preparado a receber escrita
         criaFicheiro();
     }
+
+    public int numeroRegistos(){
+        int count = 0;
+        try{
+            FileInputStream fis = context.openFileInput(FileName);
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            while ( br.readLine() != null)   {
+                count++;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(context,"Erro a ler o ficheiro",Toast.LENGTH_LONG).show();
+        }
+        return count-1;
+    }
+
 
     public void saveFile(String text){
 
