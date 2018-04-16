@@ -178,6 +178,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     btnstart.setBackgroundResource(R.drawable.button_desligado);
                     btnend.setEnabled(true);
                     btnend.setBackgroundResource(R.drawable.button);
+                    btntranf.setEnabled(false);
+                    btntranf.setBackgroundResource(R.drawable.button_desligado);
                 }
 
             }
@@ -205,6 +207,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 btnstart.setBackgroundResource(R.drawable.button);
                 btnend.setEnabled(false);
                 btnend.setBackgroundResource(R.drawable.button_desligado);
+                btntranf.setEnabled(true);
+                btntranf.setBackgroundResource(R.drawable.button);
             }
         });
 
@@ -214,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View view) {
                 file.apaga_ficheiro();
+                Toast.makeText(getApplicationContext(), "Ficheiro Transferido", Toast.LENGTH_LONG).show();
             }
         });
 
