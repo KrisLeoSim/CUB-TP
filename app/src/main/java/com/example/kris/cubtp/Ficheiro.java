@@ -134,7 +134,7 @@ public class Ficheiro {
             }
         }catch (Exception e){
             e.printStackTrace();
-            Toast.makeText(context,"Erro a ler o ficheiro",Toast.LENGTH_LONG).show();
+            //Toast.makeText(context,"Erro a ler o ficheiro",Toast.LENGTH_LONG).show();
         }
 
         resultaro = "  Andar (" + cAndar + ")" + "\n" + "  Conduzir (" + cConduzir + ")" + "\n" + "  Saltar (" + cSaltar + ")" + "\n" + "  Subir Escadas (" + cSubir + ")" + "\n" + "  Descer Escadas (" + cDescer + ")";
