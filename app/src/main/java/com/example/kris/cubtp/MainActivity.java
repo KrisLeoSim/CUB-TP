@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private LocationRequest mLocationRequest;
 
-    private static int UPDATE_INTERVAL = 6000;
-    private static int FATEST_INTERVAL = 3000;
+    private static int UPDATE_INTERVAL = 10000;
+    private static int FATEST_INTERVAL = 5000;
     private static int DISPLACEMENT = 10;
 
     private TextView lblLocation;
