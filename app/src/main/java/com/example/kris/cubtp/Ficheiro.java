@@ -185,7 +185,6 @@ public class Ficheiro {
 
     public String GetNomeFicheiro(){
         String nomeUnico;
-
             nomeUnico = "CUB_KS_" + getDataTempo() + ".csv";
             System.out.println("Gerei o nome: "+ nomeUnico);
             //Toast.makeText(context,nomeUnico,Toast.LENGTH_LONG).show();
