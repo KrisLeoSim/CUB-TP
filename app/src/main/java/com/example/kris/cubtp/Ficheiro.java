@@ -4,14 +4,17 @@ package com.example.kris.cubtp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
+
+import com.jcraft.jsch.*;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -189,6 +192,60 @@ public class Ficheiro {
         return nomeUnico ;
     }
 
+    public void transfer_fich(){
+        new LongOperation().execute();
+    }
 
+
+    private class LongOperation extends AsyncTask<Void, Integer, String> {
+        @Override
+        protected String doInBackground(Void... params) {
+            try {
+                JSch ssh = new JSch();
+                Session session = ssh.getSession("cubistudent", "urbysense.dei.uc.pt", 22);
+              // Remember that this is just for testing and we need a quick access, you can add an identity and known_hosts file to prevent
+                // Man In the Middle attacks
+                java.util.Properties config = new java.util.Properties();
+                config.put("StrictHostKeyChecking", "no");
+                session.setConfig(config);
+                session.setPassword("mis_cubi_2018");
+
+                session.connect();
+                Channel channel = session.openChannel("sftp");
+                channel.connect();
+
+                ChannelSftp sftp = (ChannelSftp) channel;
+
+                sftp.cd("/home/cubistudent/a21230192_a21230463");
+                // If you need to display the progress of the upload, read how to do it in the end of the article
+            // use the put method , if you are using android remember to remove "file://" and use only the relative path
+                sftp.put(context.getFileStreamPath(FileName).getPath(), FileName);
+
+
+                channel.disconnect();
+                session.disconnect();
+
+
+
+            } catch (JSchException e) {
+                System.out.println(e.getMessage().toString());
+                e.printStackTrace();
+            } catch (SftpException e) {
+                System.out.println(e.getMessage().toString());
+                e.printStackTrace();
+            }
+
+            //System.out.println("AQUIIII" + context.getFileStreamPath(FileName).getPath());
+            return "Terminado";
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d("PostExecuted", result);
+            //Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+            apaga_ficheiro();
+        }
+    }
 
 }
