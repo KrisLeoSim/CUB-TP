@@ -585,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     y_acc = accelerometerValues[1];
                     z_acc = accelerometerValues[2];
 
-                    textacelerometro.setText("XX: " + (int) x_acc + "   Y: " + (int) y_acc + "   Z: " + (int) z_acc + "    acc: ", TextView.BufferType.NORMAL);
+                    textacelerometro.setText("X: " + (int) x_acc + "   Y: " + (int) y_acc + "   Z: " + (int) z_acc + "    acc: ", TextView.BufferType.NORMAL);
 
                     //floatXTotal += accelerometerValues[0];
                     //tvXTotal.setText(floatXTotal + "");
