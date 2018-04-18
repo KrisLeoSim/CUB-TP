@@ -243,8 +243,9 @@ public class Ficheiro {
         @Override
         protected void onPostExecute(String result) {
             Log.d("PostExecuted", result);
-            //Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+
             apaga_ficheiro();
+            Toast.makeText(context.getApplicationContext(), "Ficheiro transferido", Toast.LENGTH_SHORT).show();
         }
     }
 
